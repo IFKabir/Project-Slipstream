@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .venv/
+venv/
 env/
 
 f1_cache/
@@ -14,3 +15,7 @@ build/
 .idea/
 
 *.csv
+
+# Compiled inference binary (platform-specific, compile locally)
+models/inference
+models/inference.exe

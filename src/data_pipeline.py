@@ -1,12 +1,19 @@
 import fastf1
 import pandas as pd
 import os
+import sys
 
-# Tell FastF1 to put the cache folder one level up
-cache_dir = "f1_cache"
-if not os.path.exists(cache_dir):
-    os.makedirs(cache_dir)
-fastf1.Cache.enable_cache(cache_dir)
+# --- ABSOLUTE PATH CONFIGURATION ---
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.join(SCRIPT_DIR, "..")
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+CACHE_DIR = os.path.join(PROJECT_ROOT, "f1_cache")
+OUTPUT_FILE = os.path.join(DATA_DIR, "f1_raw_data_master.csv")
+
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(CACHE_DIR, exist_ok=True)
+fastf1.Cache.enable_cache(CACHE_DIR)
+
 
 def fetch_season_data(year):
     print(f"Fetching data for the {year} season...")
@@ -20,7 +27,7 @@ def fetch_season_data(year):
         try:
             qualifying = fastf1.get_session(year, race_name, 'Q')
             race = fastf1.get_session(year, race_name, 'R')
-            
+
             qualifying.load(telemetry=False, weather=False)
             race.load(telemetry=False, weather=False)
 
@@ -38,12 +45,22 @@ def fetch_season_data(year):
 
     return pd.concat(season_data, ignore_index=True)
 
+
+def run(force=False):
+    """Run the data pipeline. Skips if data already exists unless force=True."""
+    if os.path.exists(OUTPUT_FILE) and not force:
+        print(f"Data already exists at {OUTPUT_FILE}. Skipping fetch. Use --force to re-download.")
+        return
+
+    # Ergast API and F1 live timing changes broke automatic fetches for >= 2025.
+    # Use 2024 as the stable training dataset to keep exactly 1 year of data.
+    current_year = 2024
+    df_current = fetch_season_data(current_year)
+
+    df_current.to_csv(OUTPUT_FILE, index=False)
+    print(f"\nMaster Data saved to {OUTPUT_FILE}")
+
+
 if __name__ == "__main__":
-    df_2023 = fetch_season_data(2023)
-    df_2024 = fetch_season_data(2024)
-    
-    combined_df = pd.concat([df_2023, df_2024], ignore_index=True)
-    
-    # Save to the data folder
-    combined_df.to_csv("data/f1_raw_data_master.csv", index=False)
-    print("\nMaster Data saved to data/f1_raw_data_master.csv")
+    force = "--force" in sys.argv
+    run(force=force)

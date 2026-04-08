@@ -1,19 +1,30 @@
 import pandas as pd
 import json
+import os
+
+# --- ABSOLUTE PATH CONFIGURATION ---
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.join(SCRIPT_DIR, "..")
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+
+QUALI_FILE = os.path.join(DATA_DIR, "quali_results.json")
+ENGINEERED_FILE = os.path.join(DATA_DIR, "f1_engineered_data.csv")
+OUTPUT_FILE = os.path.join(DATA_DIR, "starting_grid.json")
+
 
 def prepare_race_day_grid():
     print("Loading Qualifying Results...")
     try:
-        with open("data/quali_results.json", "r") as f:
+        with open(QUALI_FILE, "r") as f:
             quali_data = json.load(f)
     except FileNotFoundError:
-        print("Error: quali_results.json not found in data/")
+        print(f"Error: {QUALI_FILE} not found.")
         return
 
     try:
-        df_history = pd.read_csv("data/f1_engineered_data.csv")
+        df_history = pd.read_csv(ENGINEERED_FILE)
     except FileNotFoundError:
-        print("Error: f1_engineered_data.csv not found in data/")
+        print(f"Error: {ENGINEERED_FILE} not found.")
         return
 
     final_grid = []
@@ -36,10 +47,11 @@ def prepare_race_day_grid():
             "recent_form": float(recent_form)
         })
 
-    with open("data/starting_grid.json", "w") as f:
+    with open(OUTPUT_FILE, "w") as f:
         json.dump(final_grid, f, indent=4)
-    
+
     print("Auto-calculation complete! 'starting_grid.json' is ready for the C++ engine.")
+
 
 if __name__ == "__main__":
     prepare_race_day_grid()

@@ -1,24 +1,38 @@
 import pandas as pd
 import json
+import os
+import sys
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 
-def train_f1_model(input_csv):
+# --- ABSOLUTE PATH CONFIGURATION ---
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.join(SCRIPT_DIR, "..")
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
+
+INPUT_FILE = os.path.join(DATA_DIR, "f1_engineered_data.csv")
+OUTPUT_FILE = os.path.join(MODELS_DIR, "model_metadata.json")
+
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+
+def train_f1_model(input_csv, output_json):
     df = pd.read_csv(input_csv)
-    
+
     X = df[['GridPosition', 'Recent_3_Race_Avg']]
     y = df['FinalPosition']
-    
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+
     print("Training the Random Forest Regressor...")
     model = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
     model.fit(X_train, y_train)
-    
+
     y_pred = model.predict(X_test)
     print(f"\nMean Absolute Error: {mean_absolute_error(y_test, y_pred):.2f} grid positions")
-    
+
     export_data = {
         "n_estimators": len(model.estimators_),
         "feature_names": list(X.columns),
@@ -36,7 +50,7 @@ def train_f1_model(input_csv):
                 "left": int(tree_.children_left[i]) if not is_leaf else -1,
                 "right": int(tree_.children_right[i]) if not is_leaf else -1,
                 "is_leaf": bool(is_leaf),
-                "prob": float(tree_.value[i][0][0]) 
+                "prob": float(tree_.value[i][0][0])
             }
             nodes.append(node)
         return {"nodes": nodes}
@@ -44,12 +58,24 @@ def train_f1_model(input_csv):
     for estimator in model.estimators_:
         export_data["trees"].append(extract_tree(estimator))
 
-    # Save the AI weights to the models folder
-    with open("models/model_metadata.json", "w") as f:
+    with open(output_json, "w") as f:
         json.dump(export_data, f)
-    
-    print("\nModel training complete. Metadata saved to models/model_metadata.json")
+
+    print(f"\nModel training complete. Metadata saved to {output_json}")
+
+
+def run(force=False):
+    """Run model training. Skips if model is up to date unless force=True."""
+    if os.path.exists(OUTPUT_FILE) and not force:
+        if os.path.exists(INPUT_FILE):
+            input_mtime = os.path.getmtime(INPUT_FILE)
+            output_mtime = os.path.getmtime(OUTPUT_FILE)
+            if output_mtime >= input_mtime:
+                print(f"Model is up to date. Skipping. Use --force to re-train.")
+                return
+    train_f1_model(INPUT_FILE, OUTPUT_FILE)
+
 
 if __name__ == "__main__":
-    # Read the training data from the data folder
-    train_f1_model("data/f1_engineered_data.csv")
+    force = "--force" in sys.argv
+    run(force=force)
