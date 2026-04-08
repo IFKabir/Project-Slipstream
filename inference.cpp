@@ -101,7 +101,6 @@ struct Driver
     double predicted_finish;
 };
 
-// Custom sorting function for the leaderboard
 bool compareDrivers(const Driver &a, const Driver &b)
 {
     return a.predicted_finish < b.predicted_finish;
@@ -116,7 +115,6 @@ int main()
         return 1;
     }
 
-    // Load the Weekend Grid
     std::ifstream grid_file("starting_grid.json");
     if (!grid_file.is_open())
     {
@@ -128,7 +126,6 @@ int main()
     grid_file >> grid_json;
     std::vector<Driver> grid;
 
-    // Run AI prediction for each driver
     for (const auto &d : grid_json)
     {
         Driver driver;
@@ -138,10 +135,8 @@ int main()
         grid.push_back(driver);
     }
 
-    // Sort grid from 1st place to Last place
     std::sort(grid.begin(), grid.end(), compareDrivers);
 
-    // Output final results
     std::cout << "\n========================================\n";
     std::cout << "🏁 GRAND PRIX RACE CLASSIFICATION 🏁\n";
     std::cout << "========================================\n";

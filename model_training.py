@@ -12,7 +12,6 @@ def train_f1_model(input_csv):
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # Use Regressor instead of Classifier to predict continuous finish position
     print("Training the Random Forest Regressor...")
     model = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
     model.fit(X_train, y_train)
@@ -20,7 +19,6 @@ def train_f1_model(input_csv):
     y_pred = model.predict(X_test)
     print(f"\nMean Absolute Error: {mean_absolute_error(y_test, y_pred):.2f} grid positions")
     
-    # --- EXPORT MODEL LOGIC TO JSON FOR C++ ---
     export_data = {
         "n_estimators": len(model.estimators_),
         "feature_names": list(X.columns),

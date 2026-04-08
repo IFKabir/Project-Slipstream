@@ -26,16 +26,13 @@ st.divider()
 if st.button("Run Full Simulation", type="primary", width='stretch'):
     with st.spinner("Calculating Historical Form and Executing C++ Engine..."):
         try:
-            # 1. Run the Python script to auto-calculate Recent Form
             subprocess.run(["python", "prepare_grid.py"], check=True)
             
-            # 2. Run the C++ Inference Engine
             result = subprocess.run(["inference.exe"], capture_output=True, text=True, encoding="utf-8", check=True)
             
             st.success("Simulation Complete!")
             st.code(result.stdout, language="text")
             
-            # (Optional) Show the calculated form so the user can see what the Python script did
             with open("starting_grid.json", "r") as f:
                 auto_grid = pd.DataFrame(json.load(f))
                 auto_grid.columns = ["Driver", "Grid Position", "Auto-Calculated Form"]

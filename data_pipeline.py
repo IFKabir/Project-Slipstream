@@ -12,7 +12,6 @@ def fetch_season_data(year):
     schedule = fastf1.get_event_schedule(year)
     season_data = []
 
-    # Using head(3) for quick testing. Remove .head(3) to process the whole year
     for index, event in schedule.head(3).iterrows():
         race_name = event['EventName']
         print(f"Processing: {race_name}")
