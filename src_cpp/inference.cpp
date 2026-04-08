@@ -187,7 +187,7 @@ int main()
     {
         Driver driver;
         driver.name = d["driver"];
-        driver.features = {d["grid_pos"], d["recent_form"]};
+        driver.features = {d["grid_pos"], d["momentum_score"], d["racecraft_rating"]};
         driver.predicted_finish = forest.predict(driver.features);
         grid.push_back(driver);
     }

@@ -29,6 +29,8 @@ def prepare_race_day_grid():
 
     final_grid = []
 
+    points_map = {1:25, 2:18, 3:15, 4:12, 5:10, 6:8, 7:6, 8:4, 9:2, 10:1}
+
     for entry in quali_data:
         driver = entry["driver"]
         grid_pos = entry["grid_pos"]
@@ -37,14 +39,17 @@ def prepare_race_day_grid():
 
         if len(driver_history) > 0:
             recent_races = driver_history.tail(3)
-            recent_form = recent_races["FinalPosition"].mean()
+            momentum_score = recent_races["FinalPosition"].map(points_map).fillna(0).ewm(span=3, adjust=False).mean().iloc[-1]
+            racecraft_rating = float(recent_races["GridPosition"].iloc[-1] - recent_races["FinalPosition"].iloc[-1])
         else:
-            recent_form = 10.0
+            momentum_score = 0.0
+            racecraft_rating = 0.0
 
         final_grid.append({
             "driver": driver,
             "grid_pos": float(grid_pos),
-            "recent_form": float(recent_form)
+            "momentum_score": float(momentum_score),
+            "racecraft_rating": float(racecraft_rating)
         })
 
     with open(OUTPUT_FILE, "w") as f:

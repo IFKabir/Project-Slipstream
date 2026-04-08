@@ -111,7 +111,7 @@ if st.button("Run Full Simulation", type="primary", use_container_width=True):
             # (Optional) Expandable section to show the math behind it
             with open(STARTING_GRID_FILE, "r") as f:
                 auto_grid = pd.DataFrame(json.load(f))
-                auto_grid.columns = ["Driver", "Grid Position", "Auto-Calculated Form"]
+                auto_grid.columns = ["Driver", "Grid Position", "Momentum Score", "Racecraft Rating"]
 
             with st.expander("View Auto-Calculated Input Math"):
                 st.markdown("These are the final variables Python sent to the C++ Engine.")

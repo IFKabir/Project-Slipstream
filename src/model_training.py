@@ -21,7 +21,7 @@ os.makedirs(MODELS_DIR, exist_ok=True)
 def train_f1_model(input_csv, output_json):
     df = pd.read_csv(input_csv)
 
-    X = df[['GridPosition', 'Recent_3_Race_Avg']]
+    X = df[['GridPosition', 'Momentum_Score', 'Racecraft_Rating']]
     y = df['FinalPosition']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

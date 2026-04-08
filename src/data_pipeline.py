@@ -54,7 +54,7 @@ def run(force=False):
 
     # Ergast API and F1 live timing changes broke automatic fetches for >= 2025.
     # Use 2024 as the stable training dataset to keep exactly 1 year of data.
-    current_year = 2024
+    current_year = 2026
     df_current = fetch_season_data(current_year)
 
     df_current.to_csv(OUTPUT_FILE, index=False)
