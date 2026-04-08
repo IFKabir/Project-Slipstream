@@ -1,0 +1,1 @@
+{"n_estimators": 100, "feature_names": ["GridPosition", "Recent_3_Race_Avg", "Front_Runner_Car"], "classes": [0, 1]}

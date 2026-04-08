@@ -31,7 +31,7 @@ def train_f1_model(input_csv):
         "feature_names": list(X.columns),
         "classes": model.classes_.tolist()
     }
-    with open("model_metadata.json", "json") as f:
+    with open("model_metadata.json", "w") as f:
         json.dump(export_data, f)
     
     print("\nModel training complete. Metadata saved to model_metadata.json")
