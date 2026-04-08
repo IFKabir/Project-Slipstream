@@ -12,7 +12,7 @@ def fetch_season_data(year):
     schedule = fastf1.get_event_schedule(year)
     season_data = []
 
-    for index, event in schedule.head(3).iterrows():
+    for index, event in schedule.iterrows():
         race_name = event['EventName']
         print(f"Processing: {race_name}")
 
@@ -39,5 +39,9 @@ def fetch_season_data(year):
 
 if __name__ == "__main__":
     df_2023 = fetch_season_data(2023)
-    df_2023.to_csv("f1_raw_data_2023.csv", index=False)
-    print("\nData saved to f1_raw_data_2023.csv")
+    df_2024 = fetch_season_data(2024)
+    
+    combined_df = pd.concat([df_2023, df_2024], ignore_index=True)
+    
+    combined_df.to_csv("f1_raw_data_master.csv", index=False)
+    print("\nMaster Data saved to f1_raw_data_master.csv")

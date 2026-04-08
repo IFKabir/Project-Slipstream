@@ -28,12 +28,12 @@ if st.button("Run Full Simulation", type="primary", width='stretch'):
         try:
             subprocess.run(["python", "prepare_grid.py"], check=True)
             
-            result = subprocess.run(["inference.exe"], capture_output=True, text=True, encoding="utf-8", check=True)
+            result = subprocess.run(["../models/inference.exe"], capture_output=True, text=True, encoding="utf-8", check=True)
             
             st.success("Simulation Complete!")
             st.code(result.stdout, language="text")
             
-            with open("starting_grid.json", "r") as f:
+            with open("../data/starting_grid.json", "r") as f:
                 auto_grid = pd.DataFrame(json.load(f))
                 auto_grid.columns = ["Driver", "Grid Position", "Auto-Calculated Form"]
             with st.expander("View Auto-Calculated Math"):

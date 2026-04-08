@@ -21,4 +21,4 @@ def engineer_features(input_csv, output_csv):
     print(f"\nFeature engineering complete. Saved to {output_csv}")
 
 if __name__ == "__main__":
-    engineer_features("f1_raw_data_2023.csv", "f1_engineered_data.csv")
+    engineer_features("f1_raw_data_master.csv", "f1_engineered_data.csv")

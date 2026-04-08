@@ -3,10 +3,10 @@ import json
 
 def prepare_race_day_grid():
     print("Loading Qualifying Results...")
-    with open("quali_results.json", "r") as f:
+    with open("../data/quali_results.json", "r") as f:
         quali_data = json.load(f)
 
-    df_history = pd.read_csv("f1_engineered_data.csv")
+    df_history = pd.read_csv("../data/f1_engineered_data.csv")
 
     final_grid = []
 
@@ -28,7 +28,7 @@ def prepare_race_day_grid():
             "recent_form": float(recent_form)
         })
 
-    with open("starting_grid.json", "w") as f:
+    with open("../data/starting_grid.json", "w") as f:
         json.dump(final_grid, f, indent=4)
     
     print("Auto-calculation complete! 'starting_grid.json' is ready for the C++ engine.")
