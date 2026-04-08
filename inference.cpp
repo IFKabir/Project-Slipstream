@@ -2,7 +2,9 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include "nlohmann/json.hpp"
+#include <algorithm>
+#include <iomanip>
+#include "include/nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
@@ -12,8 +14,8 @@ struct TreeNode
     double threshold;
     int left_child;
     int right_child;
-    double podium_prob;
     bool is_leaf;
+    double expected_finish;
 };
 
 class DecisionTree
@@ -23,22 +25,21 @@ public:
 
     double predict(const std::vector<double> &features) const
     {
-        int current_node_idx = 0;
+        int current_idx = 0;
 
-        while (!nodes[current_node_idx].is_leaf)
+        while (!nodes[current_idx].is_leaf)
         {
-            const TreeNode &current = nodes[current_node_idx];
-
+            const TreeNode &current = nodes[current_idx];
             if (features[current.feature_index] <= current.threshold)
             {
-                current_node_idx = current.left_child;
+                current_idx = current.left_child;
             }
             else
             {
-                current_node_idx = current.right_child;
+                current_idx = current.right_child;
             }
         }
-        return nodes[current_node_idx].podium_prob;
+        return nodes[current_idx].expected_finish;
     }
 };
 
@@ -47,34 +48,111 @@ class RandomForest
 public:
     std::vector<DecisionTree> trees;
 
-    void load_model(const std::string &filepath)
+    bool load_model(const std::string &filepath)
     {
         std::ifstream file(filepath);
+        if (!file.is_open())
+        {
+            std::cerr << "Error: Could not open model file: " << filepath << "\n";
+            return false;
+        }
+
         json j;
         file >> j;
 
-        std::cout << "Successfully loaded " << j["n_estimators"] << " trees into memory.\n";
+        for (const auto &tree_json : j["trees"])
+        {
+            DecisionTree tree;
+            for (const auto &node_json : tree_json["nodes"])
+            {
+                TreeNode node;
+                node.feature_index = node_json["feature"];
+                node.threshold = node_json["threshold"];
+                node.left_child = node_json["left"];
+                node.right_child = node_json["right"];
+                node.is_leaf = node_json["is_leaf"];
+                node.expected_finish = node_json["prob"];
+
+                tree.nodes.push_back(node);
+            }
+            trees.push_back(tree);
+        }
+        return true;
     }
 
     double predict(const std::vector<double> &features) const
     {
-        double total_prob = 0.0;
+        if (trees.empty())
+            return 0.0;
+
+        double total_score = 0.0;
         for (const auto &tree : trees)
         {
-            total_prob += tree.predict(features);
+            total_score += tree.predict(features);
         }
-        return total_prob / trees.size();
+        return total_score / trees.size();
     }
 };
+
+struct Driver
+{
+    std::string name;
+    std::vector<double> features;
+    double predicted_finish;
+};
+
+// Custom sorting function for the leaderboard
+bool compareDrivers(const Driver &a, const Driver &b)
+{
+    return a.predicted_finish < b.predicted_finish;
+}
 
 int main()
 {
     RandomForest forest;
 
-    std::cout << "Initializing Inference Engine...\n";
+    if (!forest.load_model("model_metadata.json"))
+    {
+        return 1;
+    }
 
-    std::vector<double> driver_features = {2.0, 3.5, 1.0};
+    // Load the Weekend Grid
+    std::ifstream grid_file("starting_grid.json");
+    if (!grid_file.is_open())
+    {
+        std::cerr << "Error: Could not find starting_grid.json\n";
+        return 1;
+    }
 
-    std::cout << "Engine ready for high-throughput inference.\n";
+    json grid_json;
+    grid_file >> grid_json;
+    std::vector<Driver> grid;
+
+    // Run AI prediction for each driver
+    for (const auto &d : grid_json)
+    {
+        Driver driver;
+        driver.name = d["driver"];
+        driver.features = {d["grid_pos"], d["recent_form"]};
+        driver.predicted_finish = forest.predict(driver.features);
+        grid.push_back(driver);
+    }
+
+    // Sort grid from 1st place to Last place
+    std::sort(grid.begin(), grid.end(), compareDrivers);
+
+    // Output final results
+    std::cout << "\n========================================\n";
+    std::cout << "🏁 GRAND PRIX RACE CLASSIFICATION 🏁\n";
+    std::cout << "========================================\n";
+
+    for (size_t i = 0; i < grid.size(); ++i)
+    {
+        std::cout << "P" << std::setw(2) << std::left << (i + 1) << " | "
+                  << std::setw(4) << grid[i].name
+                  << " | (AI Score: " << std::fixed << std::setprecision(2) << grid[i].predicted_finish << ")\n";
+    }
+    std::cout << "========================================\n";
+
     return 0;
 }

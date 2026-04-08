@@ -9,10 +9,10 @@ fastf1.Cache.enable_cache(cache_dir)
 
 def fetch_season_data(year):
     print(f"Fetching data for the {year} season...")
-    
     schedule = fastf1.get_event_schedule(year)
     season_data = []
 
+    # Using head(3) for quick testing. Remove .head(3) to process the whole year
     for index, event in schedule.head(3).iterrows():
         race_name = event['EventName']
         print(f"Processing: {race_name}")
@@ -31,8 +31,6 @@ def fetch_season_data(year):
             merged_data['RaceName'] = race_name
             merged_data['Year'] = year
 
-            merged_data['IsPodium'] = (merged_data['FinalPosition'] <= 3).astype(int)
-
             season_data.append(merged_data)
 
         except Exception as e:
@@ -41,10 +39,6 @@ def fetch_season_data(year):
     return pd.concat(season_data, ignore_index=True)
 
 if __name__ == "__main__":
-    df_2024 = fetch_season_data(2024)
-    
-    print("\n--- Phase 1 Data Preview ---")
-    print(df_2024.head(10))
-    
-    df_2024.to_csv("f1_raw_data_2024.csv", index=False)
-    print("\nData saved to f1_raw_data_2024.csv")
+    df_2023 = fetch_season_data(2023)
+    df_2023.to_csv("f1_raw_data_2023.csv", index=False)
+    print("\nData saved to f1_raw_data_2023.csv")

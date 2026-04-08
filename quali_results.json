@@ -1,0 +1,8 @@
+[
+  { "driver": "VER", "grid_pos": 1 },
+  { "driver": "NOR", "grid_pos": 2 },
+  { "driver": "LEC", "grid_pos": 3 },
+  { "driver": "HAM", "grid_pos": 6 },
+  { "driver": "ALO", "grid_pos": 8 },
+  { "driver": "SAR", "grid_pos": 20 }
+]
