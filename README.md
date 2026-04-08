@@ -10,15 +10,15 @@ Run the commands from the repository root in this order:
    ```
 2. Generate the raw dataset:
    ```bash
-   python data_pipeline.py
+   python src/data_pipeline.py
    ```
 3. Create the engineered feature dataset:
    ```bash
-   python feature_engineering.py
+   python src/feature_engineering.py
    ```
-4. Train or retrain the model and update `model_metadata.json`:
+4. Train or retrain the model and update `models/model_metadata.json`:
    ```bash
-   python model_training.py
+   python src/model_training.py
    ```
 5. Compile the C++ inference engine (from the repository root):
    ```bash

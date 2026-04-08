@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 # Tell FastF1 to put the cache folder one level up
-cache_dir = "../f1_cache"
+cache_dir = "f1_cache"
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 fastf1.Cache.enable_cache(cache_dir)
@@ -45,5 +45,5 @@ if __name__ == "__main__":
     combined_df = pd.concat([df_2023, df_2024], ignore_index=True)
     
     # Save to the data folder
-    combined_df.to_csv("../data/f1_raw_data_master.csv", index=False)
-    print("\nMaster Data saved to ../data/f1_raw_data_master.csv")
+    combined_df.to_csv("data/f1_raw_data_master.csv", index=False)
+    print("\nMaster Data saved to data/f1_raw_data_master.csv")

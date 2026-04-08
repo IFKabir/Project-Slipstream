@@ -23,6 +23,6 @@ def engineer_features(input_csv, output_csv):
 if __name__ == "__main__":
     # Point both the input and the output to the data folder
     engineer_features(
-        "../data/f1_raw_data_master.csv", 
-        "../data/f1_engineered_data.csv"
+        "data/f1_raw_data_master.csv", 
+        "data/f1_engineered_data.csv"
     )
