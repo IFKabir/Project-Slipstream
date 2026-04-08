@@ -44,10 +44,12 @@ def train_f1_model(input_csv):
     for estimator in model.estimators_:
         export_data["trees"].append(extract_tree(estimator))
 
-    with open("model_metadata.json", "w") as f:
+    # Save the AI weights to the models folder
+    with open("models/model_metadata.json", "w") as f:
         json.dump(export_data, f)
     
-    print("\nModel training complete. Metadata saved to model_metadata.json")
+    print("\nModel training complete. Metadata saved to models/model_metadata.json")
 
 if __name__ == "__main__":
-    train_f1_model("f1_engineered_data.csv")
+    # Read the training data from the data folder
+    train_f1_model("data/f1_engineered_data.csv")

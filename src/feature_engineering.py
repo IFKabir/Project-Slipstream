@@ -21,4 +21,8 @@ def engineer_features(input_csv, output_csv):
     print(f"\nFeature engineering complete. Saved to {output_csv}")
 
 if __name__ == "__main__":
-    engineer_features("f1_raw_data_master.csv", "f1_engineered_data.csv")
+    # Point both the input and the output to the data folder
+    engineer_features(
+        "../data/f1_raw_data_master.csv", 
+        "../data/f1_engineered_data.csv"
+    )

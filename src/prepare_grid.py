@@ -3,10 +3,18 @@ import json
 
 def prepare_race_day_grid():
     print("Loading Qualifying Results...")
-    with open("../data/quali_results.json", "r") as f:
-        quali_data = json.load(f)
+    try:
+        with open("data/quali_results.json", "r") as f:
+            quali_data = json.load(f)
+    except FileNotFoundError:
+        print("Error: quali_results.json not found in data/")
+        return
 
-    df_history = pd.read_csv("../data/f1_engineered_data.csv")
+    try:
+        df_history = pd.read_csv("data/f1_engineered_data.csv")
+    except FileNotFoundError:
+        print("Error: f1_engineered_data.csv not found in data/")
+        return
 
     final_grid = []
 
@@ -28,7 +36,7 @@ def prepare_race_day_grid():
             "recent_form": float(recent_form)
         })
 
-    with open("../data/starting_grid.json", "w") as f:
+    with open("data/starting_grid.json", "w") as f:
         json.dump(final_grid, f, indent=4)
     
     print("Auto-calculation complete! 'starting_grid.json' is ready for the C++ engine.")

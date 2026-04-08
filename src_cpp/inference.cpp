@@ -110,12 +110,12 @@ int main()
 {
     RandomForest forest;
 
-    if (!forest.load_model("../models/model_metadata.json"))
+    if (!forest.load_model("models/model_metadata.json"))
     {
         return 1;
     }
 
-    std::ifstream grid_file("../data/starting_grid.json");
+    std::ifstream grid_file("data/starting_grid.json");
     if (!grid_file.is_open())
     {
         std::cerr << "Error: Could not find starting_grid.json\n";
