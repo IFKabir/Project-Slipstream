@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+env/
+
+f1_cache/
+
+*.out
+*.exe
+build/
+
+.DS_Store
+.vscode/
+.idea/
