@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 import os
 
@@ -13,6 +14,13 @@ OUTPUT_FILE = os.path.join(DATA_DIR, "starting_grid.json")
 
 
 def prepare_race_day_grid():
+    """
+    Prepare the starting grid for race-day inference.
+    
+    Computes all 5 model features for each driver based on their historical data,
+    exactly matching the feature computation used during training to avoid
+    train/inference skew.
+    """
     print("Loading Qualifying Results...")
     try:
         with open(QUALI_FILE, "r") as f:
@@ -27,9 +35,10 @@ def prepare_race_day_grid():
         print(f"Error: {ENGINEERED_FILE} not found.")
         return
 
-    final_grid = []
+    # F1 points map for momentum recalculation
+    points_map = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
 
-    points_map = {1:25, 2:18, 3:15, 4:12, 5:10, 6:8, 7:6, 8:4, 9:2, 10:1}
+    final_grid = []
 
     for entry in quali_data:
         driver = entry["driver"]
@@ -38,24 +47,61 @@ def prepare_race_day_grid():
         driver_history = df_history[df_history["Abbreviation"] == driver]
 
         if len(driver_history) > 0:
+            # Use the last N races for feature computation (matching training window)
             recent_races = driver_history.tail(3)
-            momentum_score = recent_races["FinalPosition"].map(points_map).fillna(0).ewm(span=3, adjust=False).mean().iloc[-1]
-            racecraft_rating = float(recent_races["GridPosition"].iloc[-1] - recent_races["FinalPosition"].iloc[-1])
+
+            # --- Feature 1: Momentum Score ---
+            # EWMA of F1 points from recent finishes
+            recent_points = recent_races["FinalPosition"].map(points_map).fillna(0)
+            momentum_score = float(recent_points.ewm(span=3, adjust=False).mean().iloc[-1])
+
+            # --- Feature 2: Racecraft Rating ---
+            # Average positions gained/lost over recent races
+            positions_gained = recent_races["GridPosition"] - recent_races["FinalPosition"]
+            racecraft_rating = float(positions_gained.mean())
+
+            # --- Feature 3: Constructor Strength ---
+            # Use the pre-computed value from the most recent race in history
+            if "Constructor_Strength" in driver_history.columns:
+                constructor_strength = float(driver_history["Constructor_Strength"].iloc[-1])
+            else:
+                # Fallback: compute from team's recent performance
+                if "TeamName" in driver_history.columns:
+                    team = driver_history["TeamName"].iloc[-1]
+                    team_drivers = df_history[df_history["TeamName"] == team]
+                    team_points = team_drivers.tail(6)["FinalPosition"].map(points_map).fillna(0)
+                    constructor_strength = float(team_points.ewm(span=3, adjust=False).mean().iloc[-1])
+                else:
+                    constructor_strength = 0.0
+
+            # --- Feature 4: Consistency ---
+            # Standard deviation of recent finish positions (lower = more consistent)
+            if "Consistency" in driver_history.columns and not pd.isna(driver_history["Consistency"].iloc[-1]):
+                consistency = float(driver_history["Consistency"].iloc[-1])
+            else:
+                consistency = float(recent_races["FinalPosition"].std()) if len(recent_races) > 1 else 2.89
         else:
+            # Unknown driver — use neutral defaults
             momentum_score = 0.0
             racecraft_rating = 0.0
+            constructor_strength = 0.0
+            consistency = 2.89  # approximate median
 
         final_grid.append({
             "driver": driver,
-            "grid_pos": float(grid_pos),
-            "momentum_score": float(momentum_score),
-            "racecraft_rating": float(racecraft_rating)
+            "GridPosition": float(grid_pos),
+            "Momentum_Score": round(momentum_score, 4),
+            "Racecraft_Rating": round(racecraft_rating, 4),
+            "Constructor_Strength": round(constructor_strength, 4),
+            "Consistency": round(consistency, 4)
         })
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(final_grid, f, indent=4)
 
-    print("Auto-calculation complete! 'starting_grid.json' is ready for the C++ engine.")
+    print(f"Auto-calculation complete! {len(final_grid)} drivers prepared.")
+    print(f"  Features: GridPosition, Momentum_Score, Racecraft_Rating, Constructor_Strength, Consistency")
+    print(f"  Output: '{OUTPUT_FILE}' is ready for the C++ engine.")
 
 
 if __name__ == "__main__":

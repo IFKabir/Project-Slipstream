@@ -1,0 +1,17 @@
+{
+  "model_type": "random_forest",
+  "mae": 3.3,
+  "rmse": 4.41,
+  "r2": 0.423,
+  "feature_importances": {
+    "GridPosition": 0.5391,
+    "Momentum_Score": 0.2442,
+    "Racecraft_Rating": 0.0495,
+    "Constructor_Strength": 0.1135,
+    "Consistency": 0.0536
+  },
+  "n_training_rows": 784,
+  "n_features": 5,
+  "cv_rf_mae": 3.03,
+  "cv_gb_mae": 3.23
+}

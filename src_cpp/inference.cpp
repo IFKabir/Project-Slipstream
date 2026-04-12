@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iomanip>
+#include <cmath>
 #include "include/nlohmann/json.hpp"
 
 // Cross-platform path separator and filesystem utilities
@@ -81,6 +82,9 @@ class RandomForest
 {
 public:
     std::vector<DecisionTree> trees;
+    std::string model_type;
+    double learning_rate;
+    double init_value;
 
     bool load_model(const std::string &filepath)
     {
@@ -93,6 +97,11 @@ public:
 
         json j;
         file >> j;
+
+        // Read model type (defaults to random_forest for backward compatibility)
+        model_type = j.value("model_type", "random_forest");
+        learning_rate = j.value("learning_rate", 0.1);
+        init_value = j.value("init_value", 0.0);
 
         for (const auto &tree_json : j["trees"])
         {
@@ -119,18 +128,33 @@ public:
         if (trees.empty())
             return 0.0;
 
-        double total_score = 0.0;
-        for (const auto &tree : trees)
+        if (model_type == "gradient_boosting")
         {
-            total_score += tree.predict(features);
+            // Gradient Boosting: init_value + learning_rate * sum(tree predictions)
+            double total_score = init_value;
+            for (const auto &tree : trees)
+            {
+                total_score += learning_rate * tree.predict(features);
+            }
+            return total_score;
         }
-        return total_score / trees.size();
+        else
+        {
+            // Random Forest: average of all tree predictions
+            double total_score = 0.0;
+            for (const auto &tree : trees)
+            {
+                total_score += tree.predict(features);
+            }
+            return total_score / trees.size();
+        }
     }
 };
 
 struct Driver
 {
     std::string name;
+    int grid_pos;
     std::vector<double> features;
     double predicted_finish;
 };
@@ -164,6 +188,7 @@ int main()
 
     std::string model_path = path_join(exe_dir, "model_metadata.json");
     std::string grid_path = path_join(project_root, path_join("data", "starting_grid.json"));
+    std::string predictions_path = path_join(project_root, path_join("data", "predictions.json"));
 
     RandomForest forest;
 
@@ -187,24 +212,76 @@ int main()
     {
         Driver driver;
         driver.name = d["driver"];
-        driver.features = {d["grid_pos"], d["momentum_score"], d["racecraft_rating"]};
+        driver.grid_pos = static_cast<int>(d["GridPosition"].get<double>());
+
+        // Read all 5 features: GridPosition, Momentum_Score, Racecraft_Rating,
+        //                       Constructor_Strength, Consistency
+        driver.features = {
+            d["GridPosition"].get<double>(),
+            d.value("Momentum_Score", 0.0),
+            d.value("Racecraft_Rating", 0.0),
+            d.value("Constructor_Strength", 0.0),
+            d.value("Consistency", 2.89)
+        };
+
         driver.predicted_finish = forest.predict(driver.features);
         grid.push_back(driver);
     }
 
     std::sort(grid.begin(), grid.end(), compareDrivers);
 
-    std::cout << "\n========================================\n";
-    std::cout << "  GRAND PRIX RACE CLASSIFICATION\n";
-    std::cout << "========================================\n";
+    // --- Display Race Classification ---
+    double leader_score = grid.empty() ? 0.0 : grid[0].predicted_finish;
+
+    std::cout << "\n==========================================\n";
+    std::cout << "   GRAND PRIX RACE CLASSIFICATION\n";
+    std::cout << "==========================================\n";
+    std::cout << std::left << std::setw(5) << "POS"
+              << std::setw(5) << "DRV"
+              << std::setw(6) << "GRID"
+              << std::setw(10) << "SCORE"
+              << "GAP\n";
+    std::cout << "------------------------------------------\n";
 
     for (size_t i = 0; i < grid.size(); ++i)
     {
-        std::cout << "P" << std::setw(2) << std::left << (i + 1) << " | "
-                  << std::setw(4) << grid[i].name
-                  << " | (AI Score: " << std::fixed << std::setprecision(2) << grid[i].predicted_finish << ")\n";
+        double gap = grid[i].predicted_finish - leader_score;
+        std::cout << "P" << std::setw(3) << std::left << (i + 1) << " "
+                  << std::setw(5) << grid[i].name
+                  << std::setw(6) << grid[i].grid_pos
+                  << std::fixed << std::setprecision(2)
+                  << std::setw(10) << grid[i].predicted_finish;
+
+        if (i == 0)
+        {
+            std::cout << "LEADER";
+        }
+        else
+        {
+            std::cout << "+" << std::fixed << std::setprecision(2) << gap;
+        }
+        std::cout << "\n";
     }
-    std::cout << "========================================\n";
+    std::cout << "==========================================\n";
+
+    // --- Save predictions JSON ---
+    json predictions = json::array();
+    for (size_t i = 0; i < grid.size(); ++i)
+    {
+        json pred;
+        pred["driver"] = grid[i].name;
+        pred["grid_pos"] = grid[i].grid_pos;
+        pred["position"] = static_cast<int>(i + 1);
+        pred["score"] = std::round(grid[i].predicted_finish * 100.0) / 100.0;
+        predictions.push_back(pred);
+    }
+
+    std::ofstream out_file(predictions_path);
+    if (out_file.is_open())
+    {
+        out_file << predictions.dump(2) << "\n";
+        out_file.close();
+    }
 
     return 0;
 }

@@ -1,0 +1,134 @@
+[
+  {
+    "driver": "ANT",
+    "grid_pos": 1,
+    "position": 1,
+    "score": 1.03
+  },
+  {
+    "driver": "LEC",
+    "grid_pos": 4,
+    "position": 2,
+    "score": 2.87
+  },
+  {
+    "driver": "RUS",
+    "grid_pos": 2,
+    "position": 3,
+    "score": 3.17
+  },
+  {
+    "driver": "PIA",
+    "grid_pos": 3,
+    "position": 4,
+    "score": 5.48
+  },
+  {
+    "driver": "GAS",
+    "grid_pos": 7,
+    "position": 5,
+    "score": 7.44
+  },
+  {
+    "driver": "NOR",
+    "grid_pos": 5,
+    "position": 6,
+    "score": 7.85
+  },
+  {
+    "driver": "HAM",
+    "grid_pos": 6,
+    "position": 7,
+    "score": 7.99
+  },
+  {
+    "driver": "VER",
+    "grid_pos": 11,
+    "position": 8,
+    "score": 8.68
+  },
+  {
+    "driver": "HAD",
+    "grid_pos": 8,
+    "position": 9,
+    "score": 11.04
+  },
+  {
+    "driver": "LIN",
+    "grid_pos": 10,
+    "position": 10,
+    "score": 11.32
+  },
+  {
+    "driver": "HUL",
+    "grid_pos": 13,
+    "position": 11,
+    "score": 12.32
+  },
+  {
+    "driver": "OCO",
+    "grid_pos": 12,
+    "position": 12,
+    "score": 12.39
+  },
+  {
+    "driver": "BOR",
+    "grid_pos": 9,
+    "position": 13,
+    "score": 12.58
+  },
+  {
+    "driver": "LAW",
+    "grid_pos": 14,
+    "position": 14,
+    "score": 13.59
+  },
+  {
+    "driver": "COL",
+    "grid_pos": 15,
+    "position": 15,
+    "score": 14.1
+  },
+  {
+    "driver": "SAI",
+    "grid_pos": 16,
+    "position": 16,
+    "score": 14.63
+  },
+  {
+    "driver": "ALB",
+    "grid_pos": 17,
+    "position": 17,
+    "score": 14.68
+  },
+  {
+    "driver": "ALO",
+    "grid_pos": 21,
+    "position": 18,
+    "score": 15.02
+  },
+  {
+    "driver": "BOT",
+    "grid_pos": 20,
+    "position": 19,
+    "score": 15.29
+  },
+  {
+    "driver": "STR",
+    "grid_pos": 22,
+    "position": 20,
+    "score": 15.31
+  },
+  {
+    "driver": "PER",
+    "grid_pos": 19,
+    "position": 21,
+    "score": 15.39
+  },
+  {
+    "driver": "BEA",
+    "grid_pos": 18,
+    "position": 22,
+    "score": 17.0
+  }
+]
