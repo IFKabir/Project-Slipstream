@@ -1,122 +1,122 @@
 [
   {
-    "driver": "VER",
-    "grid_pos": 4,
-    "position": 1,
-    "score": 5.07
-  },
-  {
     "driver": "NOR",
     "grid_pos": 1,
+    "position": 1,
+    "score": 4.46
+  },
+  {
+    "driver": "PIA",
+    "grid_pos": 2,
     "position": 2,
-    "score": 5.54
+    "score": 5.78
   },
   {
     "driver": "SAI",
     "grid_pos": 3,
     "position": 3,
-    "score": 5.81
+    "score": 6.01
   },
   {
-    "driver": "PIA",
-    "grid_pos": 2,
-    "position": 4,
-    "score": 5.89
-  },
-  {
-    "driver": "GAS",
+    "driver": "VER",
     "grid_pos": 5,
-    "position": 5,
-    "score": 7.21
-  },
-  {
-    "driver": "LEC",
-    "grid_pos": 19,
-    "position": 6,
-    "score": 7.25
-  },
-  {
-    "driver": "RUS",
-    "grid_pos": 6,
-    "position": 7,
-    "score": 7.88
+    "position": 4,
+    "score": 7.49
   },
   {
     "driver": "HUL",
-    "grid_pos": 7,
-    "position": 8,
-    "score": 9.01
+    "grid_pos": 4,
+    "position": 5,
+    "score": 7.59
   },
   {
-    "driver": "OCO",
-    "grid_pos": 17,
-    "position": 9,
-    "score": 10.24
+    "driver": "GAS",
+    "grid_pos": 6,
+    "position": 6,
+    "score": 7.79
+  },
+  {
+    "driver": "RUS",
+    "grid_pos": 7,
+    "position": 7,
+    "score": 8.34
   },
   {
     "driver": "PER",
     "grid_pos": 10,
+    "position": 8,
+    "score": 8.55
+  },
+  {
+    "driver": "LEC",
+    "grid_pos": 14,
+    "position": 9,
+    "score": 9.75
+  },
+  {
+    "driver": "ALO",
+    "grid_pos": 8,
     "position": 10,
-    "score": 10.65
+    "score": 11.13
   },
   {
     "driver": "TSU",
     "grid_pos": 11,
     "position": 11,
-    "score": 11.57
+    "score": 11.95
   },
   {
     "driver": "LAW",
     "grid_pos": 12,
     "position": 12,
-    "score": 11.71
+    "score": 12.19
   },
   {
     "driver": "STR",
     "grid_pos": 13,
     "position": 13,
-    "score": 12.77
+    "score": 13.4
+  },
+  {
+    "driver": "DOO",
+    "grid_pos": 20,
+    "position": 14,
+    "score": 13.55
   },
   {
     "driver": "BOT",
     "grid_pos": 9,
-    "position": 14,
-    "score": 12.91
-  },
-  {
-    "driver": "ALO",
-    "grid_pos": 8,
     "position": 15,
-    "score": 13.09
-  },
-  {
-    "driver": "ALB",
-    "grid_pos": 18,
-    "position": 16,
-    "score": 13.45
+    "score": 13.58
   },
   {
     "driver": "HAM",
-    "grid_pos": 16,
-    "position": 17,
-    "score": 13.91
-  },
-  {
-    "driver": "COL",
-    "grid_pos": 20,
-    "position": 18,
-    "score": 14.89
+    "grid_pos": 18,
+    "position": 16,
+    "score": 14.22
   },
   {
     "driver": "MAG",
-    "grid_pos": 14,
-    "position": 19,
-    "score": 15.21
+    "grid_pos": 15,
+    "position": 17,
+    "score": 14.54
+  },
+  {
+    "driver": "COL",
+    "grid_pos": 19,
+    "position": 18,
+    "score": 15.23
   },
   {
     "driver": "ZHO",
-    "grid_pos": 15,
+    "grid_pos": 17,
+    "position": 19,
+    "score": 15.4
+  },
+  {
+    "driver": "ALB",
+    "grid_pos": 16,
     "position": 20,
-    "score": 15.48
+    "score": 15.46
   }
 ]

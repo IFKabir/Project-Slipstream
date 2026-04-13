@@ -1,17 +1,17 @@
 {
   "model_type": "random_forest",
-  "mae": 3.28,
-  "rmse": 4.22,
-  "r2": 0.463,
+  "mae": 3.53,
+  "rmse": 4.7,
+  "r2": 0.423,
   "feature_importances": {
-    "GridPosition": 0.6529,
-    "Momentum_Score": 0.2308,
-    "Racecraft_Rating": 0.0567,
-    "Constructor_Strength": 0.0,
-    "Consistency": 0.0596
+    "GridPosition": 0.619,
+    "Momentum_Score": 0.0889,
+    "Racecraft_Rating": 0.0423,
+    "Constructor_Strength": 0.2055,
+    "Consistency": 0.0442
   },
-  "n_training_rows": 5108,
+  "n_training_rows": 5248,
   "n_features": 5,
-  "cv_rf_mae": 3.67,
-  "cv_gb_mae": 3.75
+  "cv_rf_mae": 3.56,
+  "cv_gb_mae": 3.66
 }
