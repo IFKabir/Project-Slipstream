@@ -3,7 +3,6 @@ import numpy as np
 import json
 import os
 
-# --- ABSOLUTE PATH CONFIGURATION ---
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.join(SCRIPT_DIR, "..")
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
@@ -35,7 +34,6 @@ def prepare_race_day_grid():
         print(f"Error: {ENGINEERED_FILE} not found.")
         return
 
-    # F1 points map for momentum recalculation
     points_map = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
 
     final_grid = []
@@ -47,25 +45,20 @@ def prepare_race_day_grid():
         driver_history = df_history[df_history["Abbreviation"] == driver]
 
         if len(driver_history) > 0:
-            # Use the last N races for feature computation (matching training window)
             recent_races = driver_history.tail(3)
 
             # --- Feature 1: Momentum Score ---
-            # EWMA of F1 points from recent finishes
             recent_points = recent_races["FinalPosition"].map(points_map).fillna(0)
             momentum_score = float(recent_points.ewm(span=3, adjust=False).mean().iloc[-1])
 
             # --- Feature 2: Racecraft Rating ---
-            # Average positions gained/lost over recent races
             positions_gained = recent_races["GridPosition"] - recent_races["FinalPosition"]
             racecraft_rating = float(positions_gained.mean())
 
             # --- Feature 3: Constructor Strength ---
-            # Use the pre-computed value from the most recent race in history
             if "Constructor_Strength" in driver_history.columns:
                 constructor_strength = float(driver_history["Constructor_Strength"].iloc[-1])
             else:
-                # Fallback: compute from team's recent performance
                 if "TeamName" in driver_history.columns:
                     team = driver_history["TeamName"].iloc[-1]
                     team_drivers = df_history[df_history["TeamName"] == team]
@@ -75,17 +68,15 @@ def prepare_race_day_grid():
                     constructor_strength = 0.0
 
             # --- Feature 4: Consistency ---
-            # Standard deviation of recent finish positions (lower = more consistent)
             if "Consistency" in driver_history.columns and not pd.isna(driver_history["Consistency"].iloc[-1]):
                 consistency = float(driver_history["Consistency"].iloc[-1])
             else:
                 consistency = float(recent_races["FinalPosition"].std()) if len(recent_races) > 1 else 2.89
         else:
-            # Unknown driver — use neutral defaults
             momentum_score = 0.0
             racecraft_rating = 0.0
             constructor_strength = 0.0
-            consistency = 2.89  # approximate median
+            consistency = 2.89
 
         final_grid.append({
             "driver": driver,

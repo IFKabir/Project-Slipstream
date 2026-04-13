@@ -6,8 +6,6 @@ import sys
 import os
 import platform
 
-# --- ABSOLUTE PATH CONFIGURATION ---
-# This ensures the app always finds the right files, regardless of where the terminal is open.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.join(SCRIPT_DIR, "..")
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
@@ -17,7 +15,6 @@ QUALI_FILE = os.path.join(DATA_DIR, "quali_results.json")
 STARTING_GRID_FILE = os.path.join(DATA_DIR, "starting_grid.json")
 METRICS_FILE = os.path.join(MODELS_DIR, "model_metrics.json")
 
-# Cross-platform: on Windows use .exe, on Linux/Mac use no extension
 if platform.system() == "Windows":
     INFERENCE_EXE = os.path.join(MODELS_DIR, "inference.exe")
 else:
@@ -25,7 +22,6 @@ else:
 
 MODEL_METADATA_FILE = os.path.join(MODELS_DIR, "model_metadata.json")
 
-# Add src/ to the Python path so we can import pipeline modules directly
 sys.path.insert(0, SCRIPT_DIR)
 import data_pipeline
 import feature_engineering
@@ -33,7 +29,6 @@ import model_training
 import prepare_grid
 
 
-# --- UI Configuration ---
 st.set_page_config(page_title="F1 Grand Prix Predictor", page_icon="🏎️", layout="centered")
 
 st.title("🏎️ AI Grand Prix Simulator")
@@ -42,7 +37,6 @@ This engine automatically calculates driver momentum from historical data, requi
 Qualifying results to run a full 20-car race simulation via a C++ backend.
 """)
 
-# --- Sidebar: Model Info ---
 with st.sidebar:
     st.header("📈 Model Info")
     if os.path.exists(METRICS_FILE):
@@ -58,7 +52,6 @@ with st.sidebar:
         st.metric("Training Rows", metrics.get("n_training_rows", "N/A"))
         st.metric("Features", metrics.get("n_features", "N/A"))
 
-        # Feature importances
         importances = metrics.get("feature_importances", {})
         if importances:
             st.subheader("Feature Importances")
@@ -68,7 +61,6 @@ with st.sidebar:
             ])
             st.dataframe(imp_df, use_container_width=True, hide_index=True)
 
-        # CV comparison
         cv_rf = metrics.get("cv_rf_mae")
         cv_gb = metrics.get("cv_gb_mae")
         if cv_rf and cv_gb:
@@ -84,7 +76,6 @@ with st.sidebar:
 
 st.divider()
 
-# --- 1. Load and Display the Qualifying Grid ---
 st.subheader("📊 Weekend Qualifying Results")
 try:
     with open(QUALI_FILE, "r") as f:
@@ -99,13 +90,9 @@ except FileNotFoundError:
 
 st.divider()
 
-# --- 2. Execute the Simulation ---
 if st.button("Run Full Simulation", type="primary", use_container_width=True):
     with st.spinner("Updating Model & Executing Simulation..."):
         try:
-            # Step 0: Ensure data, features, and model are up to date.
-            # These functions use smart caching — they skip if files are already
-            # up to date. No redundant data fetching or model training.
             with st.status("Checking pipeline...", expanded=False) as status:
                 st.write("Checking raw data...")
                 data_pipeline.run()
@@ -121,7 +108,6 @@ if st.button("Run Full Simulation", type="primary", use_container_width=True):
 
                 status.update(label="Pipeline ready!", state="complete")
 
-            # Check if required files exist before running C++
             if not os.path.exists(STARTING_GRID_FILE):
                 st.error("Error: starting_grid.json was not created. Check prepare_grid.py output.")
                 st.stop()
@@ -137,20 +123,17 @@ if st.button("Run Full Simulation", type="primary", use_container_width=True):
                 )
                 st.stop()
 
-            # Step B: Run the C++ Inference Engine
             result = subprocess.run(
                 [INFERENCE_EXE],
                 capture_output=True, text=True, encoding="utf-8",
                 check=True,
-                cwd=PROJECT_ROOT  # Set CWD to project root as a safety fallback
+                cwd=PROJECT_ROOT
             )
 
             st.success("Simulation Complete!")
 
-            # Display the final leaderboard exactly as C++ formatted it
             st.code(result.stdout, language="text")
 
-            # (Optional) Expandable section to show the math behind it
             with open(STARTING_GRID_FILE, "r") as f:
                 auto_grid = pd.DataFrame(json.load(f))
                 auto_grid.columns = ["Driver", "Grid Position", "Momentum Score",

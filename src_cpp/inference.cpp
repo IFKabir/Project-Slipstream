@@ -7,7 +7,6 @@
 #include <cmath>
 #include "include/nlohmann/json.hpp"
 
-// Cross-platform path separator and filesystem utilities
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -19,7 +18,6 @@
 
 using json = nlohmann::json;
 
-// Get the directory that the executable lives in
 std::string get_exe_dir()
 {
 #ifdef _WIN32
@@ -33,7 +31,6 @@ std::string get_exe_dir()
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
     if (len == -1)
     {
-        // Fallback: try current working directory
         return ".";
     }
     buf[len] = '\0';
@@ -98,7 +95,6 @@ public:
         json j;
         file >> j;
 
-        // Read model type (defaults to random_forest for backward compatibility)
         model_type = j.value("model_type", "random_forest");
         learning_rate = j.value("learning_rate", 0.1);
         init_value = j.value("init_value", 0.0);
@@ -130,7 +126,6 @@ public:
 
         if (model_type == "gradient_boosting")
         {
-            // Gradient Boosting: init_value + learning_rate * sum(tree predictions)
             double total_score = init_value;
             for (const auto &tree : trees)
             {
@@ -140,7 +135,6 @@ public:
         }
         else
         {
-            // Random Forest: average of all tree predictions
             double total_score = 0.0;
             for (const auto &tree : trees)
             {
@@ -164,7 +158,6 @@ bool compareDrivers(const Driver &a, const Driver &b)
     return a.predicted_finish < b.predicted_finish;
 }
 
-// Cross-platform path join
 std::string path_join(const std::string &a, const std::string &b)
 {
 #ifdef _WIN32
@@ -181,9 +174,7 @@ std::string path_join(const std::string &a, const std::string &b)
 
 int main()
 {
-    // Resolve paths relative to the executable location (models/ directory)
     std::string exe_dir = get_exe_dir();
-    // The exe lives in <project>/models/, so project root is one level up
     std::string project_root = path_join(exe_dir, "..");
 
     std::string model_path = path_join(exe_dir, "model_metadata.json");
@@ -214,8 +205,6 @@ int main()
         driver.name = d["driver"];
         driver.grid_pos = static_cast<int>(d["GridPosition"].get<double>());
 
-        // Read all 5 features: GridPosition, Momentum_Score, Racecraft_Rating,
-        //                       Constructor_Strength, Consistency
         driver.features = {
             d["GridPosition"].get<double>(),
             d.value("Momentum_Score", 0.0),
@@ -230,7 +219,6 @@ int main()
 
     std::sort(grid.begin(), grid.end(), compareDrivers);
 
-    // --- Display Race Classification ---
     double leader_score = grid.empty() ? 0.0 : grid[0].predicted_finish;
 
     std::cout << "\n==========================================\n";
@@ -264,7 +252,6 @@ int main()
     }
     std::cout << "==========================================\n";
 
-    // --- Save predictions JSON ---
     json predictions = json::array();
     for (size_t i = 0; i < grid.size(); ++i)
     {

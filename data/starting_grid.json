@@ -1,178 +1,162 @@
 [
     {
-        "driver": "ANT",
+        "driver": "NOR",
         "GridPosition": 1.0,
-        "Momentum_Score": 23.25,
-        "Racecraft_Rating": 0.0,
-        "Constructor_Strength": 35.4109,
-        "Consistency": 0.7071
-    },
-    {
-        "driver": "RUS",
-        "GridPosition": 2.0,
-        "Momentum_Score": 16.75,
-        "Racecraft_Rating": -0.6667,
-        "Constructor_Strength": 35.4109,
-        "Consistency": 2.0817
+        "Momentum_Score": 10.0,
+        "Racecraft_Rating": -4.3333,
+        "Constructor_Strength": 0.0,
+        "Consistency": 2.3094
     },
     {
         "driver": "PIA",
-        "GridPosition": 3.0,
-        "Momentum_Score": 9.0,
-        "Racecraft_Rating": -9.6667,
-        "Constructor_Strength": 7.6656,
-        "Consistency": 5.8595
-    },
-    {
-        "driver": "LEC",
-        "GridPosition": 4.0,
-        "Momentum_Score": 14.25,
-        "Racecraft_Rating": 0.6667,
-        "Constructor_Strength": 27.4636,
-        "Consistency": 0.5774
-    },
-    {
-        "driver": "NOR",
-        "GridPosition": 5.0,
-        "Momentum_Score": 7.5,
-        "Racecraft_Rating": -4.3333,
-        "Constructor_Strength": 7.6656,
-        "Consistency": 10.0167
-    },
-    {
-        "driver": "HAM",
-        "GridPosition": 6.0,
-        "Momentum_Score": 10.75,
-        "Racecraft_Rating": 1.0,
-        "Constructor_Strength": 27.4636,
-        "Consistency": 0.5774
-    },
-    {
-        "driver": "GAS",
-        "GridPosition": 7.0,
-        "Momentum_Score": 5.25,
-        "Racecraft_Rating": 1.6667,
-        "Constructor_Strength": 6.9488,
-        "Consistency": 2.0817
-    },
-    {
-        "driver": "HAD",
-        "GridPosition": 8.0,
-        "Momentum_Score": 1.0,
-        "Racecraft_Rating": -6.6667,
-        "Constructor_Strength": 7.8831,
-        "Consistency": 8.4853
-    },
-    {
-        "driver": "BOR",
-        "GridPosition": 9.0,
-        "Momentum_Score": 0.5,
-        "Racecraft_Rating": -2.6667,
-        "Constructor_Strength": 1.0,
-        "Consistency": 8.4853
-    },
-    {
-        "driver": "LIN",
-        "GridPosition": 10.0,
-        "Momentum_Score": 1.0,
+        "GridPosition": 2.0,
+        "Momentum_Score": 7.0,
         "Racecraft_Rating": 0.0,
-        "Constructor_Strength": 5.0,
-        "Consistency": 2.8284
-    },
-    {
-        "driver": "VER",
-        "GridPosition": 11.0,
-        "Momentum_Score": 4.0,
-        "Racecraft_Rating": -2.0,
-        "Constructor_Strength": 7.8831,
-        "Consistency": 7.6376
-    },
-    {
-        "driver": "OCO",
-        "GridPosition": 12.0,
-        "Momentum_Score": 0.5,
-        "Racecraft_Rating": 1.0,
-        "Constructor_Strength": 7.0518,
-        "Consistency": 4.5826
-    },
-    {
-        "driver": "HUL",
-        "GridPosition": 13.0,
-        "Momentum_Score": 0.0,
-        "Racecraft_Rating": -3.0,
-        "Constructor_Strength": 1.0,
-        "Consistency": 7.3711
-    },
-    {
-        "driver": "LAW",
-        "GridPosition": 14.0,
-        "Momentum_Score": 2.5,
-        "Racecraft_Rating": 2.3333,
-        "Constructor_Strength": 5.0,
-        "Consistency": 5.0332
-    },
-    {
-        "driver": "COL",
-        "GridPosition": 15.0,
-        "Momentum_Score": 0.25,
-        "Racecraft_Rating": 1.0,
-        "Constructor_Strength": 6.9488,
-        "Consistency": 4.5092
+        "Constructor_Strength": 0.0,
+        "Consistency": 0.5774
     },
     {
         "driver": "SAI",
-        "GridPosition": 16.0,
-        "Momentum_Score": 5.0,
-        "Racecraft_Rating": 3.3333,
-        "Constructor_Strength": 1.129,
-        "Consistency": 3.5119
+        "GridPosition": 3.0,
+        "Momentum_Score": 9.0,
+        "Racecraft_Rating": -1.0,
+        "Constructor_Strength": 0.0,
+        "Consistency": 5.7735
     },
     {
-        "driver": "ALB",
-        "GridPosition": 17.0,
-        "Momentum_Score": 0.0,
+        "driver": "VER",
+        "GridPosition": 4.0,
+        "Momentum_Score": 20.0,
+        "Racecraft_Rating": 7.0,
+        "Constructor_Strength": 0.0,
+        "Consistency": 0.0
+    },
+    {
+        "driver": "GAS",
+        "GridPosition": 5.0,
+        "Momentum_Score": 7.5,
+        "Racecraft_Rating": 6.3333,
+        "Constructor_Strength": 0.0,
+        "Consistency": 3.4641
+    },
+    {
+        "driver": "RUS",
+        "GridPosition": 6.0,
+        "Momentum_Score": 10.0,
         "Racecraft_Rating": -1.3333,
-        "Constructor_Strength": 1.129,
-        "Consistency": 6.0828
-    },
-    {
-        "driver": "BEA",
-        "GridPosition": 18.0,
-        "Momentum_Score": 4.0,
-        "Racecraft_Rating": 2.0,
-        "Constructor_Strength": 7.0518,
-        "Consistency": 3.6056
-    },
-    {
-        "driver": "PER",
-        "GridPosition": 19.0,
-        "Momentum_Score": 0.0,
-        "Racecraft_Rating": 3.6667,
         "Constructor_Strength": 0.0,
-        "Consistency": 2.6458
+        "Consistency": 0.0
     },
     {
-        "driver": "BOT",
-        "GridPosition": 20.0,
-        "Momentum_Score": 0.0,
-        "Racecraft_Rating": 2.6667,
+        "driver": "HUL",
+        "GridPosition": 7.0,
+        "Momentum_Score": 2.0,
+        "Racecraft_Rating": 0.6667,
         "Constructor_Strength": 0.0,
-        "Consistency": 3.2146
+        "Consistency": 5.1962
     },
     {
         "driver": "ALO",
-        "GridPosition": 21.0,
+        "GridPosition": 8.0,
         "Momentum_Score": 0.0,
-        "Racecraft_Rating": 1.3333,
-        "Constructor_Strength": 0.1671,
-        "Consistency": 4.9329
+        "Racecraft_Rating": -5.0,
+        "Constructor_Strength": 0.0,
+        "Consistency": 1.1547
+    },
+    {
+        "driver": "BOT",
+        "GridPosition": 9.0,
+        "Momentum_Score": 0.0,
+        "Racecraft_Rating": -1.0,
+        "Constructor_Strength": 0.0,
+        "Consistency": 1.7321
+    },
+    {
+        "driver": "PER",
+        "GridPosition": 10.0,
+        "Momentum_Score": 3.0,
+        "Racecraft_Rating": 2.3333,
+        "Constructor_Strength": 0.0,
+        "Consistency": 1.7321
+    },
+    {
+        "driver": "TSU",
+        "GridPosition": 11.0,
+        "Momentum_Score": 3.0,
+        "Racecraft_Rating": -3.6667,
+        "Constructor_Strength": 0.0,
+        "Consistency": 6.9282
+    },
+    {
+        "driver": "LAW",
+        "GridPosition": 12.0,
+        "Momentum_Score": 2.0,
+        "Racecraft_Rating": -0.6667,
+        "Constructor_Strength": 0.0,
+        "Consistency": 2.8868
     },
     {
         "driver": "STR",
-        "GridPosition": 22.0,
+        "GridPosition": 13.0,
         "Momentum_Score": 0.0,
-        "Racecraft_Rating": 1.0,
-        "Constructor_Strength": 0.1671,
-        "Consistency": 2.3094
+        "Racecraft_Rating": -6.3333,
+        "Constructor_Strength": 0.0,
+        "Consistency": 2.8868
+    },
+    {
+        "driver": "MAG",
+        "GridPosition": 14.0,
+        "Momentum_Score": 0.0,
+        "Racecraft_Rating": -2.6667,
+        "Constructor_Strength": 0.0,
+        "Consistency": 3.6056
+    },
+    {
+        "driver": "ZHO",
+        "GridPosition": 15.0,
+        "Momentum_Score": 0.0,
+        "Racecraft_Rating": 3.6667,
+        "Constructor_Strength": 0.0,
+        "Consistency": 1.1547
+    },
+    {
+        "driver": "HAM",
+        "GridPosition": 16.0,
+        "Momentum_Score": 0.5,
+        "Racecraft_Rating": 3.6667,
+        "Constructor_Strength": 0.0,
+        "Consistency": 4.0415
+    },
+    {
+        "driver": "OCO",
+        "GridPosition": 17.0,
+        "Momentum_Score": 9.0,
+        "Racecraft_Rating": -0.3333,
+        "Constructor_Strength": 0.0,
+        "Consistency": 4.6188
+    },
+    {
+        "driver": "ALB",
+        "GridPosition": 18.0,
+        "Momentum_Score": 0.0,
+        "Racecraft_Rating": -7.3333,
+        "Constructor_Strength": 0.0,
+        "Consistency": 0.0
+    },
+    {
+        "driver": "LEC",
+        "GridPosition": 19.0,
+        "Momentum_Score": 17.5,
+        "Racecraft_Rating": 1.6667,
+        "Constructor_Strength": 0.0,
+        "Consistency": 0.0
+    },
+    {
+        "driver": "COL",
+        "GridPosition": 20.0,
+        "Momentum_Score": 0.5,
+        "Racecraft_Rating": 3.0,
+        "Constructor_Strength": 0.0,
+        "Consistency": 3.4641
     }
 ]
