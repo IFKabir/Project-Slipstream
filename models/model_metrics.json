@@ -1,20 +1,27 @@
 {
   "model_type": "random_forest",
-  "mae": 3.53,
-  "rmse": 4.7,
-  "r2": 0.423,
+  "best_params": {
+    "max_depth": 6,
+    "min_samples_split": 10,
+    "n_estimators": 100
+  },
+  "mae": 3.52,
+  "rmse": 4.66,
+  "r2": 0.431,
   "feature_importances": {
-    "GridPosition": 0.619,
-    "Momentum_Score": 0.0889,
-    "Racecraft_Rating": 0.0423,
-    "Constructor_Strength": 0.2055,
-    "Consistency": 0.0442
+    "GridPosition": 0.7003,
+    "Momentum_Score": 0.0661,
+    "Racecraft_Rating": 0.0195,
+    "Constructor_Strength": 0.1814,
+    "Consistency": 0.0185,
+    "Teammate_Grid_Delta": 0.0108,
+    "Recent_DNFs": 0.0034
   },
   "n_training_rows": 5248,
   "n_testing_rows": 1297,
-  "n_features": 5,
-  "cv_rf_mae": 3.56,
-  "cv_gb_mae": 3.66,
+  "n_features": 7,
+  "cv_rf_mae": 3.55,
+  "cv_gb_mae": 3.65,
   "dummy_baseline_mae": 5.32,
   "dummy_baseline_rmse": 6.18,
   "residual_within_2_pct": 36.9

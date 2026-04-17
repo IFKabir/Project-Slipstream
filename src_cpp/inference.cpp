@@ -210,7 +210,9 @@ int main()
             d.value("Momentum_Score", 0.0),
             d.value("Racecraft_Rating", 0.0),
             d.value("Constructor_Strength", 0.0),
-            d.value("Consistency", 2.89)
+            d.value("Consistency", 2.89),
+            d.value("Teammate_Grid_Delta", 0.0),
+            d.value("Recent_DNFs", 0.0)
         };
 
         driver.predicted_finish = forest.predict(driver.features);

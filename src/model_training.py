@@ -3,7 +3,7 @@ import numpy as np
 import json
 import os
 import sys
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, GridSearchCV, learning_curve
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.dummy import DummyRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -28,7 +28,8 @@ os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 FEATURE_COLUMNS = ['GridPosition', 'Momentum_Score', 'Racecraft_Rating',
-                    'Constructor_Strength', 'Consistency']
+                    'Constructor_Strength', 'Consistency',
+                    'Teammate_Grid_Delta', 'Recent_DNFs']
 
 
 def train_f1_model(input_csv, output_json):
@@ -56,7 +57,7 @@ def train_f1_model(input_csv, output_json):
                 print(f"Failed to fetch schedule for {y}: {e}")
 
     # =========================================================================
-    # TASK 1: Chronological Grouped Time-Series Split
+    # Chronological Grouped Time-Series Split
     # =========================================================================
     # 1. Ensure data is perfectly chronological first
     df = df.sort_values(['Year', 'Round']) 
@@ -66,13 +67,9 @@ def train_f1_model(input_csv, output_json):
 
     # 2. Loop through the dataset, isolating one year at a time
     for year, group in df.groupby('Year'):
-        # Find out how many total races happened this year (e.g., 19 in 2010, 24 in 2024)
         total_races = group['Round'].nunique()
-        
-        # Calculate where the 80% cutoff is for this specific calendar
         cutoff_round = int(total_races * 0.8)
         
-        # Split the year into the first 80% (Train) and final 20% (Test)
         train_year = group[group['Round'] <= cutoff_round]
         test_year = group[group['Round'] > cutoff_round]
         
@@ -95,7 +92,7 @@ def train_f1_model(input_csv, output_json):
     print(f"  Testing rows:  {len(X_test)} (Final 20% of every season)")
 
     # =========================================================================
-    # TASK 2a: Academic Baseline — DummyRegressor
+    # Academic Baseline -- DummyRegressor
     # =========================================================================
     print("\n--- Academic Baseline (DummyRegressor) ---")
     dummy = DummyRegressor(strategy='mean')
@@ -107,22 +104,41 @@ def train_f1_model(input_csv, output_json):
     print(f"  Dummy (Mean) RMSE:  {dummy_rmse:.2f} positions")
 
     # =========================================================================
-    # Model Evaluation — 5-Fold Cross-Validation
+    # GridSearchCV -- Hyperparameter Optimization
     # =========================================================================
-    print("\nEvaluating models with 5-fold cross-validation...\n")
+    print("\n--- GridSearchCV: Optimizing Random Forest ---")
 
-    rf_model = RandomForestRegressor(
-        n_estimators=150,
-        max_depth=8,
-        min_samples_split=5,
+    param_grid = {
+        'n_estimators': [100, 200],
+        'max_depth': [4, 6, 8, 10],
+        'min_samples_split': [2, 5, 10],
+    }
+
+    rf_base = RandomForestRegressor(
         min_samples_leaf=3,
         random_state=42
     )
-    rf_cv_scores = cross_val_score(rf_model, X_train, y_train, cv=5,
-                                    scoring='neg_mean_absolute_error')
-    rf_cv_mae = -rf_cv_scores.mean()
-    print(f"  Random Forest    — CV MAE: {rf_cv_mae:.2f} (±{rf_cv_scores.std():.2f})")
 
+    grid_search = GridSearchCV(
+        estimator=rf_base,
+        param_grid=param_grid,
+        cv=5,
+        scoring='neg_mean_absolute_error',
+        n_jobs=-1,
+        verbose=1
+    )
+    grid_search.fit(X_train, y_train)
+
+    best_params = grid_search.best_params_
+    best_cv_mae = -grid_search.best_score_
+
+    print(f"\n  Best Parameters Found:")
+    for k, v in best_params.items():
+        print(f"    {k}: {v}")
+    print(f"  Best CV MAE: {best_cv_mae:.2f}")
+
+    # Also evaluate Gradient Boosting for comparison
+    print("\n--- Cross-Validation: Gradient Boosting Baseline ---")
     gb_model = GradientBoostingRegressor(
         n_estimators=200,
         max_depth=5,
@@ -135,19 +151,27 @@ def train_f1_model(input_csv, output_json):
     gb_cv_scores = cross_val_score(gb_model, X_train, y_train, cv=5,
                                     scoring='neg_mean_absolute_error')
     gb_cv_mae = -gb_cv_scores.mean()
-    print(f"  Gradient Boosting — CV MAE: {gb_cv_mae:.2f} (±{gb_cv_scores.std():.2f})")
+    print(f"  Gradient Boosting CV MAE: {gb_cv_mae:.2f} (+/-{gb_cv_scores.std():.2f})")
 
-    if rf_cv_mae <= gb_cv_mae:
-        print(f"\n[OK] Selected: Random Forest (lower CV MAE)")
-        best_model = rf_model
+    # Select best model
+    if best_cv_mae <= gb_cv_mae:
+        print(f"\n[OK] Selected: Random Forest (GridSearchCV-optimized, lower CV MAE)")
+        best_model = grid_search.best_estimator_
         model_type = "random_forest"
+        rf_cv_mae = best_cv_mae
     else:
         print(f"\n[OK] Selected: Gradient Boosting (lower CV MAE)")
+        gb_model.fit(X_train, y_train)
         best_model = gb_model
         model_type = "gradient_boosting"
+        rf_cv_mae = best_cv_mae
 
-    print(f"\nTraining {model_type} on full training set...")
-    best_model.fit(X_train, y_train)
+    # If RF was selected, it's already fitted by GridSearchCV
+    # If GB was selected, it was fitted above
+    if model_type == "random_forest":
+        print(f"\nUsing GridSearchCV best estimator (already fitted on full training set).")
+    else:
+        print(f"\nTraining {model_type} on full training set...")
 
     y_pred = best_model.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
@@ -157,21 +181,21 @@ def train_f1_model(input_csv, output_json):
     print(f"\n--- Test Set Metrics ---")
     print(f"  Mean Absolute Error:  {mae:.2f} positions")
     print(f"  Root Mean Sq Error:   {rmse:.2f} positions")
-    print(f"  R² Score:             {r2:.3f}")
+    print(f"  R2 Score:             {r2:.3f}")
 
     # Show improvement over baseline
     improvement = ((dummy_mae - mae) / dummy_mae) * 100
     print(f"\n  >> Model beats Dummy baseline by {improvement:.1f}% (MAE)")
 
     # =========================================================================
-    # TASK 2b: Residual Analysis
+    # Residual Analysis
     # =========================================================================
     residuals = np.abs(y_test.values - y_pred)
     within_2 = np.sum(residuals <= 2.0)
     pct_within_2 = (within_2 / len(residuals)) * 100
 
     print(f"\n--- Residual Analysis ---")
-    print(f"  Predictions within ±2.0 grid positions: {within_2}/{len(residuals)} ({pct_within_2:.1f}%)")
+    print(f"  Predictions within +/-2.0 grid positions: {within_2}/{len(residuals)} ({pct_within_2:.1f}%)")
     print(f"  Mean Absolute Residual:  {residuals.mean():.2f}")
     print(f"  Median Absolute Residual: {np.median(residuals):.2f}")
     print(f"  Max Absolute Residual:   {residuals.max():.2f}")
@@ -185,7 +209,7 @@ def train_f1_model(input_csv, output_json):
         print(f"  {feat:25s} {imp:.4f}")
 
     # =========================================================================
-    # TASK 3: Generate Analytical Plots
+    # Generate Analytical Plots
     # =========================================================================
     print(f"\nGenerating analytical plots in '{PLOTS_DIR}'...")
 
@@ -200,7 +224,7 @@ def train_f1_model(input_csv, output_json):
     colors = sns.color_palette("viridis", len(feat_names))
     ax.barh(feat_names, feat_values, color=colors, edgecolor='black', linewidth=0.5)
     ax.set_xlabel("Importance Score", fontsize=13)
-    ax.set_title("Feature Importance — Random Forest Regressor", fontsize=15, fontweight='bold')
+    ax.set_title("Feature Importance -- Optimized Random Forest", fontsize=15, fontweight='bold')
 
     for i, v in enumerate(feat_values):
         ax.text(v + 0.005, i, f"{v:.4f}", va='center', fontsize=10)
@@ -215,7 +239,6 @@ def train_f1_model(input_csv, output_json):
     ax.scatter(y_test, y_pred, alpha=0.35, edgecolors='black', linewidths=0.3,
                s=25, color='steelblue', label='Predictions')
 
-    # Perfect prediction line (y=x)
     axis_min = min(y_test.min(), y_pred.min()) - 1
     axis_max = max(y_test.max(), y_pred.max()) + 1
     ax.plot([axis_min, axis_max], [axis_min, axis_max], 'r--', linewidth=2,
@@ -223,7 +246,7 @@ def train_f1_model(input_csv, output_json):
 
     ax.set_xlabel("Actual Finish Position", fontsize=13)
     ax.set_ylabel("Predicted Finish Position", fontsize=13)
-    ax.set_title("Actual vs Predicted — Test Set", fontsize=15, fontweight='bold')
+    ax.set_title("Actual vs Predicted -- Test Set", fontsize=15, fontweight='bold')
     ax.legend(fontsize=11)
     ax.set_xlim(axis_min, axis_max)
     ax.set_ylim(axis_min, axis_max)
@@ -253,7 +276,6 @@ def train_f1_model(input_csv, output_json):
         plt.close(fig)
         print("  [OK] tree_visualizer.png saved")
     else:
-        # For GradientBoosting, estimators_ is an array of arrays
         fig, ax = plt.subplots(figsize=(24, 10))
         plot_tree(
             best_model.estimators_[0][0],
@@ -270,6 +292,73 @@ def train_f1_model(input_csv, output_json):
         fig.savefig(os.path.join(PLOTS_DIR, "tree_visualizer.png"), dpi=150)
         plt.close(fig)
         print("  [OK] tree_visualizer.png saved")
+
+    # --- Plot 4: Correlation Heatmap ---
+    fig, ax = plt.subplots(figsize=(10, 8))
+    corr_matrix = X_train.corr(method='pearson')
+    mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
+    sns.heatmap(
+        corr_matrix,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        center=0,
+        mask=mask,
+        square=True,
+        linewidths=0.8,
+        ax=ax,
+        vmin=-1,
+        vmax=1,
+        cbar_kws={"shrink": 0.8, "label": "Pearson Correlation"}
+    )
+    ax.set_title("Feature Correlation Heatmap (Pearson)", fontsize=15, fontweight='bold')
+    plt.tight_layout()
+    fig.savefig(os.path.join(PLOTS_DIR, "correlation_heatmap.png"), dpi=150)
+    plt.close(fig)
+    print("  [OK] correlation_heatmap.png saved")
+
+    # --- Plot 5: Learning Curve ---
+    print("  Computing learning curve (this may take a moment)...")
+    train_sizes, train_scores, val_scores = learning_curve(
+        best_model,
+        X_train, y_train,
+        cv=5,
+        scoring='neg_mean_absolute_error',
+        train_sizes=np.linspace(0.1, 1.0, 10),
+        n_jobs=-1
+    )
+
+    train_scores_mean = -train_scores.mean(axis=1)
+    train_scores_std = train_scores.std(axis=1)
+    val_scores_mean = -val_scores.mean(axis=1)
+    val_scores_std = val_scores.std(axis=1)
+
+    fig, ax = plt.subplots(figsize=(10, 7))
+
+    ax.fill_between(train_sizes,
+                     train_scores_mean - train_scores_std,
+                     train_scores_mean + train_scores_std,
+                     alpha=0.15, color='#2196F3')
+    ax.fill_between(train_sizes,
+                     val_scores_mean - val_scores_std,
+                     val_scores_mean + val_scores_std,
+                     alpha=0.15, color='#FF5722')
+
+    ax.plot(train_sizes, train_scores_mean, 'o-', color='#2196F3',
+            linewidth=2, markersize=5, label='Training Score')
+    ax.plot(train_sizes, val_scores_mean, 'o-', color='#FF5722',
+            linewidth=2, markersize=5, label='Cross-Validation Score')
+
+    ax.set_xlabel("Training Set Size", fontsize=13)
+    ax.set_ylabel("Mean Absolute Error (positions)", fontsize=13)
+    ax.set_title("Learning Curve -- Model Performance vs Data Size", fontsize=15, fontweight='bold')
+    ax.legend(fontsize=12, loc='upper right')
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    fig.savefig(os.path.join(PLOTS_DIR, "learning_curve.png"), dpi=150)
+    plt.close(fig)
+    print("  [OK] learning_curve.png saved")
 
     # =========================================================================
     # Export Model to JSON (for C++ inference engine)
@@ -315,6 +404,7 @@ def train_f1_model(input_csv, output_json):
     # =========================================================================
     metrics = {
         "model_type": model_type,
+        "best_params": best_params,
         "mae": round(mae, 2),
         "rmse": round(rmse, 2),
         "r2": round(r2, 3),

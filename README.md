@@ -9,8 +9,8 @@
 **Project Slipstream** is an AI-powered F1 race prediction engine that combines a Python-based ML training pipeline with a high-performance C++ inference engine. The system:
 
 1. **Fetches** historical F1 race data (2010–2024) via the FastF1 API.
-2. **Engineers** five predictive features: `GridPosition`, `Momentum_Score`, `Racecraft_Rating`, `Constructor_Strength`, and `Consistency`.
-3. **Trains** a `RandomForestRegressor` and a `GradientBoostingRegressor`, selecting the best model via 5-Fold Cross-Validation.
+2. **Engineers** seven predictive features: `GridPosition`, `Momentum_Score`, `Racecraft_Rating`, `Constructor_Strength`, `Consistency`, `Teammate_Grid_Delta`, and `Recent_DNFs`.
+3. **Trains** a `RandomForestRegressor` (hyperparameters optimized via `GridSearchCV`) and a `GradientBoostingRegressor`, selecting the best model via 5-Fold Cross-Validation.
 4. **Evaluates** against a `DummyRegressor` baseline to academically prove the model's predictive power beyond random guessing.
 5. **Exports** the trained decision trees as a JSON structure, consumed by a compiled C++ binary for real-time inference.
 
@@ -50,7 +50,9 @@ Project-Slipstream/
 ├── plots/
 │   ├── feature_importance.png  # Feature weight visualization
 │   ├── actual_vs_predicted.png # Scatter: actual vs predicted
-│   └── tree_visualizer.png     # Decision tree diagram (depth=3)
+│   ├── tree_visualizer.png     # Decision tree diagram (depth=3)
+│   ├── correlation_heatmap.png # Pearson correlation matrix
+│   └── learning_curve.png      # Training vs CV score curve
 ├── tests/
 │   ├── test_fastf1.py          # FastF1 smoke test (2024)
 │   └── test_fastf1_2023.py     # FastF1 smoke test (2023)
@@ -102,7 +104,7 @@ python src/model_training.py --force
 python src/prepare_grid.py
 ```
 
-This reads `data/quali_results.json`, computes all 5 model features for each driver from their historical data, and outputs `data/starting_grid.json`.
+This reads `data/quali_results.json`, computes all 7 model features for each driver from their historical data, and outputs `data/starting_grid.json`.
 
 ### Step 4 — Compile & Run the C++ Inference Engine
 
@@ -137,10 +139,11 @@ The training script (`model_training.py`) outputs the following analysis:
 | Metric | Description |
 |--------|-------------|
 | **Dummy Baseline MAE/RMSE** | Performance of a `DummyRegressor(strategy='mean')` — proves the model is not just guessing. |
+| **GridSearchCV Best Params** | Optimal `max_depth`, `n_estimators`, `min_samples_split` found via exhaustive search. |
 | **Cross-Validation MAE** | 5-Fold CV scores for both Random Forest and Gradient Boosting. |
 | **Test Set MAE / RMSE / R²** | Final evaluation on the held-out chronological test set. |
 | **Residual Analysis** | Percentage of predictions within ±2.0 grid positions of actual results. |
-| **Feature Importances** | Relative contribution of each of the 5 features. |
+| **Feature Importances** | Relative contribution of each of the 7 features. |
 
 ### Generated Plots (saved to `plots/`)
 
@@ -149,12 +152,14 @@ The training script (`model_training.py`) outputs the following analysis:
 | Feature Importance | `feature_importance.png` | Horizontal bar chart showing the weight of each feature. |
 | Actual vs Predicted | `actual_vs_predicted.png` | Scatter plot with a red dashed y=x line showing prediction variance. |
 | Tree Visualizer | `tree_visualizer.png` | Graphical export of the first decision tree (depth-limited to 3). |
+| Correlation Heatmap | `correlation_heatmap.png` | Pearson correlation matrix of all 7 features (identifies collinearity). |
+| Learning Curve | `learning_curve.png` | Training vs CV score as data size increases (proves more data helps). |
 
 ---
 
 ## 🔧 Technical Details
 
-### Features Used (5 Total)
+### Features Used (7 Total)
 
 | Feature | Description |
 |---------|-------------|
@@ -163,12 +168,14 @@ The training script (`model_training.py`) outputs the following analysis:
 | `Racecraft_Rating` | Average positions gained/lost vs grid position (recent 3 races) |
 | `Constructor_Strength` | Team performance metric based on aggregate team results |
 | `Consistency` | Standard deviation of recent finishing positions (lower = more consistent) |
+| `Teammate_Grid_Delta` | Difference between driver's grid position and team average (negative = better) |
+| `Recent_DNFs` | Rolling 5-race count of finishes at P18 or worse (DNF/crash indicator) |
 
 ### Models Compared
 
 | Model | Configuration |
 |-------|--------------|
-| `RandomForestRegressor` | 150 estimators, max_depth=8, min_samples_split=5, min_samples_leaf=3 |
+| `RandomForestRegressor` | Optimized via `GridSearchCV` over `max_depth`, `n_estimators`, `min_samples_split` |
 | `GradientBoostingRegressor` | 200 estimators, max_depth=5, lr=0.1, subsample=0.8 |
 | `DummyRegressor` | Baseline (strategy='mean') |
 

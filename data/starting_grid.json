@@ -5,7 +5,9 @@
         "Momentum_Score": 12.5,
         "Racecraft_Rating": -3.0,
         "Constructor_Strength": 19.5375,
-        "Consistency": 2.6458
+        "Consistency": 2.6458,
+        "Teammate_Grid_Delta": -2.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "PIA",
@@ -13,7 +15,9 @@
         "Momentum_Score": 7.5,
         "Racecraft_Rating": 1.0,
         "Constructor_Strength": 19.5375,
-        "Consistency": 2.6458
+        "Consistency": 2.6458,
+        "Teammate_Grid_Delta": 2.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "SAI",
@@ -21,7 +25,9 @@
         "Momentum_Score": 11.0,
         "Racecraft_Rating": -0.3333,
         "Constructor_Strength": 14.4171,
-        "Consistency": 5.5076
+        "Consistency": 5.5076,
+        "Teammate_Grid_Delta": -0.5,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "HUL",
@@ -29,7 +35,9 @@
         "Momentum_Score": 2.0,
         "Racecraft_Rating": 1.6667,
         "Constructor_Strength": 0.4261,
-        "Consistency": 5.8595
+        "Consistency": 5.8595,
+        "Teammate_Grid_Delta": 1.5,
+        "Recent_DNFs": 1.0
     },
     {
         "driver": "VER",
@@ -37,7 +45,9 @@
         "Momentum_Score": 20.0,
         "Racecraft_Rating": 3.6667,
         "Constructor_Strength": 26.1261,
-        "Consistency": 0.5774
+        "Consistency": 0.5774,
+        "Teammate_Grid_Delta": -4.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "GAS",
@@ -45,7 +55,9 @@
         "Momentum_Score": 4.25,
         "Racecraft_Rating": 1.6667,
         "Constructor_Strength": 17.5763,
-        "Consistency": 7.0238
+        "Consistency": 7.0238,
+        "Teammate_Grid_Delta": -3.0,
+        "Recent_DNFs": 1.0
     },
     {
         "driver": "RUS",
@@ -53,7 +65,9 @@
         "Momentum_Score": 10.0,
         "Racecraft_Rating": -0.6667,
         "Constructor_Strength": 17.3312,
-        "Consistency": 0.0
+        "Consistency": 0.0,
+        "Teammate_Grid_Delta": -6.5,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "ALO",
@@ -61,7 +75,9 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": -3.6667,
         "Constructor_Strength": 1.3872,
-        "Consistency": 3.0551
+        "Consistency": 3.0551,
+        "Teammate_Grid_Delta": -3.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "BOT",
@@ -69,7 +85,9 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": -1.6667,
         "Constructor_Strength": 0.125,
-        "Consistency": 1.7321
+        "Consistency": 1.7321,
+        "Teammate_Grid_Delta": -1.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "PER",
@@ -77,7 +95,9 @@
         "Momentum_Score": 4.0,
         "Racecraft_Rating": 1.6667,
         "Constructor_Strength": 26.1261,
-        "Consistency": 1.5275
+        "Consistency": 1.5275,
+        "Teammate_Grid_Delta": 4.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "TSU",
@@ -85,7 +105,9 @@
         "Momentum_Score": 1.5,
         "Racecraft_Rating": -3.0,
         "Constructor_Strength": 4.0575,
-        "Consistency": 6.0277
+        "Consistency": 6.0277,
+        "Teammate_Grid_Delta": -2.0,
+        "Recent_DNFs": 1.0
     },
     {
         "driver": "LAW",
@@ -93,7 +115,9 @@
         "Momentum_Score": 1.5,
         "Racecraft_Rating": 1.6667,
         "Constructor_Strength": 4.0575,
-        "Consistency": 3.6056
+        "Consistency": 3.6056,
+        "Teammate_Grid_Delta": 2.0,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "STR",
@@ -101,7 +125,9 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": -3.3333,
         "Constructor_Strength": 1.3872,
-        "Consistency": 2.8868
+        "Consistency": 2.8868,
+        "Teammate_Grid_Delta": 3.0,
+        "Recent_DNFs": 3.0
     },
     {
         "driver": "LEC",
@@ -109,7 +135,9 @@
         "Momentum_Score": 17.5,
         "Racecraft_Rating": 1.3333,
         "Constructor_Strength": 14.4171,
-        "Consistency": 0.0
+        "Consistency": 0.0,
+        "Teammate_Grid_Delta": 0.5,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "MAG",
@@ -117,7 +145,9 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": -2.6667,
         "Constructor_Strength": 0.4261,
-        "Consistency": 3.6056
+        "Consistency": 3.6056,
+        "Teammate_Grid_Delta": -1.5,
+        "Recent_DNFs": 2.0
     },
     {
         "driver": "ALB",
@@ -125,7 +155,9 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": -3.3333,
         "Constructor_Strength": 0.0161,
-        "Consistency": 1.1547
+        "Consistency": 1.1547,
+        "Teammate_Grid_Delta": -0.5,
+        "Recent_DNFs": 3.0
     },
     {
         "driver": "ZHO",
@@ -133,7 +165,9 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": 2.6667,
         "Constructor_Strength": 0.125,
-        "Consistency": 1.1547
+        "Consistency": 1.1547,
+        "Teammate_Grid_Delta": 1.0,
+        "Recent_DNFs": 1.0
     },
     {
         "driver": "HAM",
@@ -141,7 +175,9 @@
         "Momentum_Score": 4.0,
         "Racecraft_Rating": 1.6667,
         "Constructor_Strength": 17.3312,
-        "Consistency": 3.5119
+        "Consistency": 3.5119,
+        "Teammate_Grid_Delta": 6.5,
+        "Recent_DNFs": 0.0
     },
     {
         "driver": "COL",
@@ -149,7 +185,9 @@
         "Momentum_Score": 0.5,
         "Racecraft_Rating": 3.0,
         "Constructor_Strength": 0.0161,
-        "Consistency": 4.1633
+        "Consistency": 4.1633,
+        "Teammate_Grid_Delta": 0.5,
+        "Recent_DNFs": 1.0
     },
     {
         "driver": "DOO",
@@ -157,6 +195,8 @@
         "Momentum_Score": 0.0,
         "Racecraft_Rating": 5.0,
         "Constructor_Strength": 7.2581,
-        "Consistency": 3.2146
+        "Consistency": 3.2146,
+        "Teammate_Grid_Delta": 7.0,
+        "Recent_DNFs": 0.0
     }
 ]

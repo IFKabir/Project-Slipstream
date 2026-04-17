@@ -65,15 +65,39 @@ def engineer_features(input_csv, output_csv):
     median_consistency = df['Consistency'].median()
     df['Consistency'] = df['Consistency'].fillna(median_consistency if not pd.isna(median_consistency) else 2.89)
 
+    # --- FEATURE 5: Teammate Grid Delta ---
+    print("Calculating Teammate Grid Delta...")
+    if 'TeamName' in df.columns and 'RaceName' in df.columns:
+        # For each race, compute the mean grid position per team
+        race_id_cols_tm = ['Year', 'RaceName', 'TeamName']
+        team_avg_grid = df.groupby(race_id_cols_tm)['GridPosition'].transform('mean')
+        # Delta = driver's grid position minus team average (negative = better than teammate)
+        df['Teammate_Grid_Delta'] = df['GridPosition'] - team_avg_grid
+        df['Teammate_Grid_Delta'] = df['Teammate_Grid_Delta'].fillna(0.0)
+    else:
+        df['Teammate_Grid_Delta'] = 0.0
+
+    # --- FEATURE 6: Recent DNFs (rolling 5-race sum) ---
+    print("Calculating Recent DNF Count...")
+    df['Is_DNF'] = (df['FinalPosition'] >= 18).astype(int)
+    df['Recent_DNFs'] = (
+        df.groupby('Abbreviation')['Is_DNF']
+        .transform(lambda x: x.shift(1).rolling(window=5, min_periods=1).sum())
+    )
+    df['Recent_DNFs'] = df['Recent_DNFs'].fillna(0.0)
+
     keep_cols = ['Abbreviation', 'RaceName', 'Year', 'TeamName',
                  'GridPosition', 'Momentum_Score', 'Racecraft_Rating',
-                 'Constructor_Strength', 'Consistency', 'FinalPosition']
+                 'Constructor_Strength', 'Consistency',
+                 'Teammate_Grid_Delta', 'Recent_DNFs',
+                 'FinalPosition']
     keep_cols = [c for c in keep_cols if c in df.columns]
     final_dataset = df[keep_cols]
 
     final_dataset.to_csv(output_csv, index=False)
     print(f"\nAdvanced feature engineering complete. Saved to {output_csv}")
-    print(f"  Features: GridPosition, Momentum_Score, Racecraft_Rating, Constructor_Strength, Consistency")
+    print(f"  Features: GridPosition, Momentum_Score, Racecraft_Rating, Constructor_Strength,")
+    print(f"            Consistency, Teammate_Grid_Delta, Recent_DNFs")
     print(f"  Rows: {len(final_dataset)}")
 
 

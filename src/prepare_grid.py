@@ -16,7 +16,7 @@ def prepare_race_day_grid():
     """
     Prepare the starting grid for race-day inference.
     
-    Computes all 5 model features for each driver based on their historical data,
+    Computes all 7 model features for each driver based on their historical data,
     exactly matching the feature computation used during training to avoid
     train/inference skew.
     """
@@ -72,11 +72,26 @@ def prepare_race_day_grid():
                 consistency = float(driver_history["Consistency"].iloc[-1])
             else:
                 consistency = float(recent_races["FinalPosition"].std()) if len(recent_races) > 1 else 2.89
+
+            # --- Feature 5: Teammate Grid Delta ---
+            if "Teammate_Grid_Delta" in driver_history.columns:
+                teammate_grid_delta = float(driver_history["Teammate_Grid_Delta"].iloc[-1])
+            else:
+                teammate_grid_delta = 0.0
+
+            # --- Feature 6: Recent DNFs ---
+            if "Recent_DNFs" in driver_history.columns:
+                recent_dnfs = float(driver_history["Recent_DNFs"].iloc[-1])
+            else:
+                last_5 = driver_history.tail(5)
+                recent_dnfs = float((last_5["FinalPosition"] >= 18).sum()) if len(last_5) > 0 else 0.0
         else:
             momentum_score = 0.0
             racecraft_rating = 0.0
             constructor_strength = 0.0
             consistency = 2.89
+            teammate_grid_delta = 0.0
+            recent_dnfs = 0.0
 
         final_grid.append({
             "driver": driver,
@@ -84,14 +99,17 @@ def prepare_race_day_grid():
             "Momentum_Score": round(momentum_score, 4),
             "Racecraft_Rating": round(racecraft_rating, 4),
             "Constructor_Strength": round(constructor_strength, 4),
-            "Consistency": round(consistency, 4)
+            "Consistency": round(consistency, 4),
+            "Teammate_Grid_Delta": round(teammate_grid_delta, 4),
+            "Recent_DNFs": round(recent_dnfs, 4)
         })
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(final_grid, f, indent=4)
 
     print(f"Auto-calculation complete! {len(final_grid)} drivers prepared.")
-    print(f"  Features: GridPosition, Momentum_Score, Racecraft_Rating, Constructor_Strength, Consistency")
+    print(f"  Features: GridPosition, Momentum_Score, Racecraft_Rating, Constructor_Strength,")
+    print(f"            Consistency, Teammate_Grid_Delta, Recent_DNFs")
     print(f"  Output: '{OUTPUT_FILE}' is ready for the C++ engine.")
 
 
