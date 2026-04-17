@@ -11,7 +11,11 @@
     "Consistency": 0.0442
   },
   "n_training_rows": 5248,
+  "n_testing_rows": 1297,
   "n_features": 5,
   "cv_rf_mae": 3.56,
-  "cv_gb_mae": 3.66
+  "cv_gb_mae": 3.66,
+  "dummy_baseline_mae": 5.32,
+  "dummy_baseline_rmse": 6.18,
+  "residual_within_2_pct": 36.9
 }
