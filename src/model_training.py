@@ -9,7 +9,7 @@ from sklearn.dummy import DummyRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend for saving plots
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.tree import plot_tree
@@ -40,7 +40,6 @@ def train_f1_model(input_csv, output_json):
             print(f"Warning: Feature '{col}' not found in data. Filling with 0.")
             df[col] = 0.0
 
-    # Ensure 'Round' column exists for chronological sorting
     if 'Round' not in df.columns:
         import fastf1
         CACHE_DIR = os.path.join(PROJECT_ROOT, "f1_cache")
@@ -56,16 +55,12 @@ def train_f1_model(input_csv, output_json):
             except Exception as e:
                 print(f"Failed to fetch schedule for {y}: {e}")
 
-    # =========================================================================
     # Chronological Grouped Time-Series Split
-    # =========================================================================
-    # 1. Ensure data is perfectly chronological first
     df = df.sort_values(['Year', 'Round']) 
     
     train_dfs = []
     test_dfs = []
 
-    # 2. Loop through the dataset, isolating one year at a time
     for year, group in df.groupby('Year'):
         total_races = group['Round'].nunique()
         cutoff_round = int(total_races * 0.8)
@@ -76,11 +71,8 @@ def train_f1_model(input_csv, output_json):
         train_dfs.append(train_year)
         test_dfs.append(test_year)
 
-    # 3. Glue all the training years together, and all the testing years together
     train_df = pd.concat(train_dfs)
     test_df = pd.concat(test_dfs)
-
-    # 4. Separate features (X) and targets (y)
     X_train = train_df[FEATURE_COLUMNS]
     y_train = train_df['FinalPosition']
     
@@ -91,9 +83,7 @@ def train_f1_model(input_csv, output_json):
     print(f"  Training rows: {len(X_train)} (First 80% of every season)")
     print(f"  Testing rows:  {len(X_test)} (Final 20% of every season)")
 
-    # =========================================================================
-    # Academic Baseline -- DummyRegressor
-    # =========================================================================
+    # DummyRegressor
     print("\n--- Academic Baseline (DummyRegressor) ---")
     dummy = DummyRegressor(strategy='mean')
     dummy.fit(X_train, y_train)
@@ -103,9 +93,7 @@ def train_f1_model(input_csv, output_json):
     print(f"  Dummy (Mean) MAE:   {dummy_mae:.2f} positions")
     print(f"  Dummy (Mean) RMSE:  {dummy_rmse:.2f} positions")
 
-    # =========================================================================
     # GridSearchCV -- Hyperparameter Optimization
-    # =========================================================================
     print("\n--- GridSearchCV: Optimizing Random Forest ---")
 
     param_grid = {
@@ -113,7 +101,7 @@ def train_f1_model(input_csv, output_json):
         'max_depth': [4, 6, 8, 10],
         'min_samples_split': [2, 5, 10],
     }
-
+    # init random forest regressor
     rf_base = RandomForestRegressor(
         min_samples_leaf=3,
         random_state=42
@@ -137,7 +125,6 @@ def train_f1_model(input_csv, output_json):
         print(f"    {k}: {v}")
     print(f"  Best CV MAE: {best_cv_mae:.2f}")
 
-    # Also evaluate Gradient Boosting for comparison
     print("\n--- Cross-Validation: Gradient Boosting Baseline ---")
     gb_model = GradientBoostingRegressor(
         n_estimators=200,
@@ -153,7 +140,6 @@ def train_f1_model(input_csv, output_json):
     gb_cv_mae = -gb_cv_scores.mean()
     print(f"  Gradient Boosting CV MAE: {gb_cv_mae:.2f} (+/-{gb_cv_scores.std():.2f})")
 
-    # Select best model
     if best_cv_mae <= gb_cv_mae:
         print(f"\n[OK] Selected: Random Forest (GridSearchCV-optimized, lower CV MAE)")
         best_model = grid_search.best_estimator_
@@ -166,8 +152,6 @@ def train_f1_model(input_csv, output_json):
         model_type = "gradient_boosting"
         rf_cv_mae = best_cv_mae
 
-    # If RF was selected, it's already fitted by GridSearchCV
-    # If GB was selected, it was fitted above
     if model_type == "random_forest":
         print(f"\nUsing GridSearchCV best estimator (already fitted on full training set).")
     else:
@@ -183,13 +167,10 @@ def train_f1_model(input_csv, output_json):
     print(f"  Root Mean Sq Error:   {rmse:.2f} positions")
     print(f"  R2 Score:             {r2:.3f}")
 
-    # Show improvement over baseline
     improvement = ((dummy_mae - mae) / dummy_mae) * 100
     print(f"\n  >> Model beats Dummy baseline by {improvement:.1f}% (MAE)")
 
-    # =========================================================================
     # Residual Analysis
-    # =========================================================================
     residuals = np.abs(y_test.values - y_pred)
     within_2 = np.sum(residuals <= 2.0)
     pct_within_2 = (within_2 / len(residuals)) * 100
@@ -200,22 +181,17 @@ def train_f1_model(input_csv, output_json):
     print(f"  Median Absolute Residual: {np.median(residuals):.2f}")
     print(f"  Max Absolute Residual:   {residuals.max():.2f}")
 
-    # =========================================================================
     # Feature Importances
-    # =========================================================================
     importances = dict(zip(FEATURE_COLUMNS, best_model.feature_importances_))
     print(f"\n--- Feature Importances ---")
     for feat, imp in sorted(importances.items(), key=lambda x: -x[1]):
         print(f"  {feat:25s} {imp:.4f}")
 
-    # =========================================================================
     # Generate Analytical Plots
-    # =========================================================================
     print(f"\nGenerating analytical plots in '{PLOTS_DIR}'...")
 
     sns.set_theme(style="whitegrid", palette="muted", font_scale=1.1)
 
-    # --- Plot 1: Feature Importance Bar Chart ---
     sorted_features = sorted(importances.items(), key=lambda x: x[1])
     feat_names = [f[0] for f in sorted_features]
     feat_values = [f[1] for f in sorted_features]
@@ -234,7 +210,6 @@ def train_f1_model(input_csv, output_json):
     plt.close(fig)
     print("  [OK] feature_importance.png saved")
 
-    # --- Plot 2: Actual vs Predicted Scatter Plot ---
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.scatter(y_test, y_pred, alpha=0.35, edgecolors='black', linewidths=0.3,
                s=25, color='steelblue', label='Predictions')
@@ -257,7 +232,6 @@ def train_f1_model(input_csv, output_json):
     plt.close(fig)
     print("  [OK] actual_vs_predicted.png saved")
 
-    # --- Plot 3: Decision Tree Visualization ---
     if model_type == "random_forest":
         fig, ax = plt.subplots(figsize=(24, 10))
         plot_tree(
@@ -293,7 +267,6 @@ def train_f1_model(input_csv, output_json):
         plt.close(fig)
         print("  [OK] tree_visualizer.png saved")
 
-    # --- Plot 4: Correlation Heatmap ---
     fig, ax = plt.subplots(figsize=(10, 8))
     corr_matrix = X_train.corr(method='pearson')
     mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
@@ -317,7 +290,6 @@ def train_f1_model(input_csv, output_json):
     plt.close(fig)
     print("  [OK] correlation_heatmap.png saved")
 
-    # --- Plot 5: Learning Curve ---
     print("  Computing learning curve (this may take a moment)...")
     train_sizes, train_scores, val_scores = learning_curve(
         best_model,
@@ -360,9 +332,7 @@ def train_f1_model(input_csv, output_json):
     plt.close(fig)
     print("  [OK] learning_curve.png saved")
 
-    # =========================================================================
-    # Export Model to JSON (for C++ inference engine)
-    # =========================================================================
+    # inference engine
     export_data = {
         "model_type": model_type,
         "n_estimators": len(best_model.estimators_) if model_type == "random_forest" else best_model.n_estimators,
@@ -399,9 +369,7 @@ def train_f1_model(input_csv, output_json):
     with open(output_json, "w") as f:
         json.dump(export_data, f)
 
-    # =========================================================================
     # Export Metrics Summary
-    # =========================================================================
     metrics = {
         "model_type": model_type,
         "best_params": best_params,
